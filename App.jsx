@@ -9,6 +9,7 @@ import theme from "./src/core/theme"; // Ensure theme is imported correctly
 import {
   RecepientStartScreen,
   Education,
+  Cart,
   Food,
   Clothes,
   ItemDetail,
@@ -53,6 +54,8 @@ export default function App() {
             options={{ title: 'Donation Details' }}
             component={DonationDetails}
           />
+          <Stack.Screen name="Cart" component={Cart} />
+
         </Stack.Navigator>
       </NavigationContainer>
     </Provider>

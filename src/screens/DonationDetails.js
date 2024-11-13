@@ -1,9 +1,26 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, Alert } from 'react-native';
 import theme from '../core/theme';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const DonationDetails = ({ route, navigation, addItemToCart }) => {
   const { item } = route.params;
+
+  // Set the cart icon in the header
+  useEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <TouchableOpacity onPress={() => navigation.navigate('Cart')}>
+          <Icon
+            name="shopping-cart"
+            size={30}
+            color={theme.colors.sageGreen}
+            style={styles.cartIcon}
+          />
+        </TouchableOpacity>
+      ),
+    });
+  }, [navigation]);
 
   const handleClaim = () => {
     Alert.alert("Are you sure?", "Do you want to claim this item?", [
@@ -68,6 +85,9 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: theme.colors.ivory || '#FFFFFF', // Fallback to #FFFFFF
     fontWeight: 'bold',
+  },
+  cartIcon: {
+    marginRight: 10,
   },
 });
 

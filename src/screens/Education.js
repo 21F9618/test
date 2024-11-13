@@ -1,8 +1,8 @@
-// src/screens/Education.js
 import React from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, FlatList } from 'react-native';
 import theme from '../core/theme';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native'; // Use useRoute to get current route
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const educationItems = [
     {
@@ -20,27 +20,30 @@ const educationItems = [
     {
         id: '3',
         image: require('../../assets/items/STATIONARY.jpg'),
-        title: 'Online Courses',
-        description: 'Free and discounted online courses for skill development.',
+        title: 'Stationery',
+        description: 'Pens, notebooks, and other stationery supplies.',
     },
+    // Additional items here...
 ];
 
 const Education = () => {
     const navigation = useNavigation();
+    const route = useRoute(); // Get current route to identify the active screen
 
     const renderItem = ({ item }) => (
         <View style={styles.donationItem}>
             <Image source={item.image} style={styles.itemImage} />
             <Text style={styles.item}>{item.title}</Text>
-            {/* <Text style={styles.itemDescription}>{item.description}</Text> */}
             <TouchableOpacity
                 style={styles.claimButton}
-                onPress={() => navigation.navigate('ItemDetail', { item })} // Navigate to ItemDetail
+                onPress={() => navigation.navigate('ItemDetail', { item })}
             >
                 <Text style={styles.claimButtonText}>Claim</Text>
             </TouchableOpacity>
         </View>
     );
+
+    const isEducationPage = route.name === 'Education'; // Check if the current route is 'Education'
 
     return (
         <View style={styles.container}>
@@ -51,9 +54,45 @@ const Education = () => {
                 numColumns={2}
                 contentContainerStyle={styles.grid}
                 ListHeaderComponent={
-                    <View style={styles.header}>
-                        <Text style={styles.title}>Education Donations</Text>
-                    </View>
+                    <>
+                        <View style={styles.iconContainer}>
+                            <TouchableOpacity onPress={() => navigation.navigate('Education')}>
+                                <Icon
+                                    name="school"
+                                    size={40}
+                                    color={isEducationPage ? theme.colors.ivory : theme.colors.sageGreen} // Highlight if on Education page
+                                    style={[styles.icon, isEducationPage && styles.activeIcon]} // Apply active style if on Education page
+                                />
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={() => navigation.navigate('Clothes')}>
+                                <Icon
+                                    name="checkroom"
+                                    size={40}
+                                    color={theme.colors.sageGreen}
+                                    style={styles.icon}
+                                />
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={() => navigation.navigate('Food')}>
+                                <Icon
+                                    name="local-dining"
+                                    size={40}
+                                    color={theme.colors.sageGreen}
+                                    style={styles.icon}
+                                />
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={() => navigation.navigate('Cart')}>
+                                <Icon
+                                    name="shopping-cart"
+                                    size={40}
+                                    color={theme.colors.sageGreen}
+                                    style={styles.icon}
+                                />
+                            </TouchableOpacity>
+                        </View>
+                        <View style={styles.header}>
+                            <Text style={styles.title}>Education Donations</Text>
+                        </View>
+                    </>
                 }
             />
         </View>
@@ -63,10 +102,9 @@ const Education = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: theme.colors.sageGreen, // Dark background color for the whole page
+        backgroundColor: theme.colors.charcoalBlack,
     },
     header: {
-        backgroundColor: theme.colors.sageGreen, // Dark background for header
         padding: 20,
         alignItems: 'center',
         borderBottomLeftRadius: 10,
@@ -74,17 +112,16 @@ const styles = StyleSheet.create({
     },
     title: {
         fontSize: 28,
-        color: theme.colors.ivory, // White color for title
+        color: theme.colors.ivory,
         fontWeight: 'bold',
     },
     grid: {
         justifyContent: 'space-between',
         marginTop: 10,
-        backgroundColor: theme.colors.sageGreen, // Sage green background for the grid
         padding: 10,
     },
     donationItem: {
-        backgroundColor: theme.colors.pearlWhite, // Light background for items
+        backgroundColor: 'rgba(72, 72, 72, 0.8)',
         padding: 15,
         borderRadius: 10,
         marginBottom: 20,
@@ -95,8 +132,8 @@ const styles = StyleSheet.create({
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.5,
         shadowRadius: 8,
-        borderWidth: 2, // Add border width
-        borderColor: theme.colors.sageGreen, // Add border color
+        borderWidth: 2,
+        borderColor: theme.colors.sageGreen,
     },
     itemImage: {
         width: 150,
@@ -108,18 +145,13 @@ const styles = StyleSheet.create({
     },
     item: {
         fontSize: 20,
-        color: theme.colors.charcoalBlack, // Dark text color for item title
+        color: theme.colors.ivory,
         textAlign: 'center',
         marginBottom: 10,
     },
-    itemDescription: {
-        fontSize: 16,
-        color: theme.colors.charcoalBlack, // Dark text for description
-        textAlign: 'center',
-        marginBottom: 15,
-    },
     claimButton: {
-        backgroundColor: theme.colors.charcoalBlack,        paddingVertical: 10,
+        backgroundColor: theme.colors.charcoalBlack,
+        paddingVertical: 10,
         paddingHorizontal: 20,
         borderColor: theme.colors.sageGreen,
         borderBottomWidth: 8,
@@ -129,8 +161,26 @@ const styles = StyleSheet.create({
     },
     claimButtonText: {
         fontSize: 18,
-        color: theme.colors.ivory, // White text for claim button
+        color: theme.colors.ivory,
         fontWeight: 'bold',
+    },
+    iconContainer: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        paddingVertical: 7,
+        backgroundColor: theme.colors.charcoalBlack,
+        borderBottomWidth: 1,
+        borderBottomColor: theme.colors.sageGreen,
+    },
+    icon: {
+        backgroundColor: theme.colors.outerSpace,
+        padding: 10,
+        borderRadius: 25,
+        marginHorizontal: 5,
+    },
+    activeIcon: {
+        backgroundColor: theme.colors.sageGreen,
+        padding: 12,
     },
 });
 
