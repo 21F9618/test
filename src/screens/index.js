@@ -1,5 +1,8 @@
-export { default as StartScreen } from "./StartScreen";
-export { default as LoginScreen } from "./LoginScreen";
-export { default as RegisterScreen } from "./RegisterScreen";
-export { default as ResetPasswordScreen } from "./ResetPasswordScreen";
-export { default as HomeScreen } from "./HomeScreen";
+// Exporting all the screens from a single file for easy imports
+
+export { default as RecepientStartScreen } from './RecepientStartScreen';
+export { default as Education } from './Education';
+export { default as Food } from './Food';
+export { default as Clothes } from './Clothes';
+export { default as ItemDetail } from './ItemDetail'; 
+export { default as DonationDetails } from './DonationDetails'; 

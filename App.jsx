@@ -2,35 +2,56 @@ import React from "react";
 import { Provider } from "react-native-paper";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
+// import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { View, Text, TouchableOpacity } from "react-native";
 
-import { theme } from "./src/core/theme";
+import theme from "./src/core/theme"; // Ensure theme is imported correctly
 import {
-  StartScreen,
-  LoginScreen,
-  RegisterScreen,
-  ResetPasswordScreen,
-  HomeScreen,
+  RecepientStartScreen,
+  Education,
+  Food,
+  Clothes,
+  ItemDetail,
+  DonationDetails,
 } from "./src/screens";
 
 const Stack = createStackNavigator();
+const Tab = createBottomTabNavigator();
+
+// Example of a nested navigator (Tab Navigator) for categories
+function CategoryTabNavigator() {
+  return (
+    <Tab.Navigator>
+      <Tab.Screen name="Education" component={Education} />
+      <Tab.Screen name="Food" component={Food} />
+      <Tab.Screen name="Clothes" component={Clothes} />
+    </Tab.Navigator>
+  );
+}
 
 export default function App() {
   return (
     <Provider theme={theme}>
       <NavigationContainer>
         <Stack.Navigator
-          initialRouteName="StartScreen"
+          initialRouteName="Welcome Recepient!"
           screenOptions={{
-            headerShown: false,
+            headerShown: true,
           }}
         >
-          <Stack.Screen name="StartScreen" component={StartScreen} />
-          <Stack.Screen name="LoginScreen" component={LoginScreen} />
-          <Stack.Screen name="RegisterScreen" component={RegisterScreen} />
-          <Stack.Screen name="HomeScreen" component={HomeScreen} />
+          <Stack.Screen name="Welcome Recepient!" component={RecepientStartScreen} />
+          
+          {/* Navigate to the Tab Navigator */}
+          <Stack.Screen name="Categories" component={CategoryTabNavigator} />
+          <Stack.Screen name="Clothes" component={Clothes} />
+          <Stack.Screen name="Education" component={Education} />
+          <Stack.Screen name="Food" component={Education} />
+
+          <Stack.Screen name="ItemDetail" component={ItemDetail} />
           <Stack.Screen
-            name="ResetPasswordScreen"
-            component={ResetPasswordScreen}
+            name="DonationDetails"
+            options={{ title: 'Donation Details' }}
+            component={DonationDetails}
           />
         </Stack.Navigator>
       </NavigationContainer>
