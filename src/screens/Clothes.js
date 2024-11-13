@@ -61,10 +61,10 @@ const Clothes = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: theme.colors.charcoalBlack,
+        backgroundColor: theme.colors.sageGreen, // Dark background color for the whole page
     },
     header: {
-        backgroundColor: theme.colors.outerSpace,
+        backgroundColor: theme.colors.sageGreen, // Dark background for header
         padding: 20,
         alignItems: 'center',
         borderBottomLeftRadius: 10,
@@ -72,21 +72,29 @@ const styles = StyleSheet.create({
     },
     title: {
         fontSize: 28,
-        color: theme.colors.ivory,
+        color: theme.colors.ivory, // White color for title
         fontWeight: 'bold',
     },
     grid: {
         justifyContent: 'space-between',
         marginTop: 10,
+        backgroundColor: theme.colors.sageGreen, // Sage green background for the grid
+        padding: 10,
     },
     donationItem: {
-        backgroundColor: theme.colors.outerSpace,
+        backgroundColor: theme.colors.pearlWhite, // Light background for items
         padding: 15,
         borderRadius: 10,
         marginBottom: 20,
         width: '45%',
         alignItems: 'center',
         marginHorizontal: '2.5%',
+        shadowColor: theme.colors.sageGreen,
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.5,
+        shadowRadius: 8,
+        borderWidth: 2, // Add border width
+        borderColor: theme.colors.sageGreen, // Add border color
     },
     itemImage: {
         width: 150,
@@ -98,26 +106,29 @@ const styles = StyleSheet.create({
     },
     item: {
         fontSize: 20,
-        color: theme.colors.pearlWhite,
+        color: theme.colors.charcoalBlack, // Dark text color for item title
         textAlign: 'center',
         marginBottom: 10,
     },
     itemDescription: {
         fontSize: 16,
-        color: theme.colors.pearlWhite,
+        color: theme.colors.charcoalBlack, // Dark text for description
         textAlign: 'center',
         marginBottom: 15,
     },
     claimButton: {
-        backgroundColor: theme.colors.sageGreen,
+        backgroundColor: theme.colors.charcoalBlack,
+        borderColor: theme.colors.sageGreen,
+        borderRadius:20 ,
+        borderBottomWidth: 8,
+        borderWidth: 3,
         paddingVertical: 10,
         paddingHorizontal: 20,
-        borderRadius: 8,
-        marginTop: 10,
+        marginTop: 10
     },
     claimButtonText: {
         fontSize: 18,
-        color: theme.colors.ivory,
+        color: theme.colors.ivory, // White text for claim button
         fontWeight: 'bold',
     },
 });

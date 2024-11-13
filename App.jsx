@@ -2,7 +2,7 @@ import React from "react";
 import { Provider } from "react-native-paper";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
-// import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { View, Text, TouchableOpacity } from "react-native";
 
 import theme from "./src/core/theme"; // Ensure theme is imported correctly
@@ -19,15 +19,15 @@ const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
 // Example of a nested navigator (Tab Navigator) for categories
-function CategoryTabNavigator() {
-  return (
-    <Tab.Navigator>
-      <Tab.Screen name="Education" component={Education} />
-      <Tab.Screen name="Food" component={Food} />
-      <Tab.Screen name="Clothes" component={Clothes} />
-    </Tab.Navigator>
-  );
-}
+// function CategoryTabNavigator() {
+//   return (
+//     <Tab.Navigator>
+//       <Tab.Screen name="Education" component={Education} />
+//       <Tab.Screen name="Food" component={Food} />
+//       <Tab.Screen name="Clothes" component={Clothes} />
+//     </Tab.Navigator>
+//   );
+// }
 
 export default function App() {
   return (
@@ -42,10 +42,10 @@ export default function App() {
           <Stack.Screen name="Welcome Recepient!" component={RecepientStartScreen} />
           
           {/* Navigate to the Tab Navigator */}
-          <Stack.Screen name="Categories" component={CategoryTabNavigator} />
+          {/* <Stack.Screen name="Categories" component={CategoryTabNavigator} /> */}
           <Stack.Screen name="Clothes" component={Clothes} />
           <Stack.Screen name="Education" component={Education} />
-          <Stack.Screen name="Food" component={Education} />
+          <Stack.Screen name="Food" component={Food} />
 
           <Stack.Screen name="ItemDetail" component={ItemDetail} />
           <Stack.Screen
