@@ -4,24 +4,18 @@ import Logo from "../components/Logo";
 import Header from "../components/Header";
 import Paragraph from "../components/Paragraph";
 import Button from "../components/Button";
+import { TouchableOpacity, StyleSheet, View } from "react-native";
 
 export default function HomeScreen({ navigation }) {
   return (
-    <Background>
-      <Logo />
-      <Header>Welcome 💫</Header>
-      <Paragraph>Congratulations you are logged in.</Paragraph>
-      <Button
-        mode="outlined"
-        onPress={() =>
-          navigation.reset({
-            index: 0,
-            routes: [{ name: "StartScreen" }],
-          })
-        }
-      >
-        Sign out
-      </Button>
-    </Background>
+    <View style={styles.container}>
+    <Text style={styles.title}>Welcome to Dast e Khair</Text>
+    <Text style={styles.subtitle}>Your place to give and receive help</Text>
+
+    <Button
+      title="Go to Donations"
+      onPress={() => navigation.navigate('/tabs')}
+    />
+  </View>
   );
 }
