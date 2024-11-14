@@ -4,13 +4,13 @@ import Logo from "../components/Logo";
 import Header from "../components/Header";
 import Paragraph from "../components/Paragraph";
 import Button from "../components/Button";
+import { StyleSheet, View, Text } from "react-native";
 
 export default function HomeScreen({ navigation }) {
   return (
     <Background>
-      <Logo />
       <Header>Welcome 💫</Header>
-      <Paragraph>Congratulations you are logged in.</Paragraph>
+      <Text>Congratulations you are logged in.</Text>
       <Button
         mode="outlined"
         onPress={() =>

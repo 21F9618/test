@@ -7,10 +7,17 @@ import { theme } from "./src/core/theme";
 import {
   StartScreen,
   LoginScreen,
-  RegisterScreen,
   ResetPasswordScreen,
   HomeScreen,
+  ChooseRole,
+  WaitForApprovalScreen,
+  RegisterScreenRecipient,
+  RegisterNGOScreen,
+  RegisterIndividualScreen,
+  DonorChoose,
+  RChoose,
 } from "./src/screens";
+import RegisterScreenDonor from "./src/screens/RegisterScreenDonor";
 
 const Stack = createStackNavigator();
 
@@ -25,13 +32,15 @@ export default function App() {
           }}
         >
           <Stack.Screen name="StartScreen" component={StartScreen} />
+          <Stack.Screen name="ChooseRole" component={ChooseRole} />
           <Stack.Screen name="LoginScreen" component={LoginScreen} />
-          <Stack.Screen name="RegisterScreen" component={RegisterScreen} />
+          <Stack.Screen name="RegisterScreenDonor" component={RegisterScreenDonor} />
+          <Stack.Screen name="RegisterNGOScreen" component={RegisterNGOScreen} />
+          <Stack.Screen name="RegisterIndividualScreen" component={RegisterIndividualScreen} />
           <Stack.Screen name="HomeScreen" component={HomeScreen} />
-          <Stack.Screen
-            name="ResetPasswordScreen"
-            component={ResetPasswordScreen}
-          />
+          <Stack.Screen name="WaitForApprovalScreen" component={WaitForApprovalScreen} />
+          <Stack.Screen name="ResetPasswordScreen" component={ResetPasswordScreen}/>
+          <Stack.Screen name="RChoose" component={RChoose}/>
         </Stack.Navigator>
       </NavigationContainer>
     </Provider>

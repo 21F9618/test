@@ -1,30 +1,33 @@
 import React from "react";
 import { ImageBackground, StyleSheet, View, Text } from "react-native";
 import Button from "../components/Button";
+import Paragraph from "../components/Paragraph";
 import { theme } from "../core/theme";
 
-export default function StartScreen({ navigation }) {
+export default function WaitForApprovalScreen({ navigation }) {
   return (
     <ImageBackground
-      source={require("../../assets/items/0d59de270836b6eafe057c8afb642e77.jpg")}
+      source={require('../../assets/items/0d59de270836b6eafe057c8afb642e77.jpg')}
       style={styles.background}
       resizeMode="cover"
+      blurRadius={2} 
     >
       <View style={styles.container}>
         {/* Header at the top left */}
         <View style={styles.header}>
           <Text style={styles.headerText}>Dast-e-khair</Text>
-          <Text style={styles.catchlineText}>Helping Communities,{'\n'}One Donation at a time</Text>
+          <Text style={styles.WText}>We got your Information,Please wait while{'\n'}Our representatives varify it.</Text>
+          <Text style={styles.W1Text}>Your Credentials will be sent to you through the email you entered.</Text>
         </View>
 
         {/* Button container at the bottom */}
         <View style={styles.buttonContainer}>
           <Button
             mode="contained"
-            onPress={() => navigation.navigate("ChooseRole")}
+            onPress={() => navigation.navigate("StartScreen")}
             style={styles.button}
           >
-            Get Started
+            Home
           </Button>
         </View>
       </View>
@@ -47,35 +50,44 @@ const styles = StyleSheet.create({
     width: '100%',
     paddingBottom: 10,  // Extra padding for the bottom
   },
-  catchlineText: {
+  WText: {
     color: theme.colors.ivory,
-    fontSize: 20,  // Slightly smaller than the main text
-    textAlign: 'left', 
+    fontSize: 18,  // Slightly smaller than the main text
+    textAlign: 'center', 
     fontWeight: 'bold',  
-    marginTop: 10,  // Add some spacing under the header
+    marginTop: 190,  // Add some spacing under the header
     padding: 5,
+  },
+  W1Text: {
+    color: 'white',
+    fontSize: 15,  // Slightly smaller than the main text
+    textAlign: 'center', 
+    fontWeight: 'bold',  
+    marginTop: 4,  // Add some spacing under the header
+    padding: 5,
+    Right: 20,
   },
   header: {
     position: 'absolute',  // Make the header stick to the top
     top: 30,  // Adjust top position as needed
-    left: 20,  // Adjust left position as needed
     padding: 5,
     borderRadius: 5,
   },
   headerText: {
-    color: theme.colors.ivory,
+    color: 'white',
     fontSize: 40,
     fontWeight: 'bold',
+    Right:20,
   },
   buttonContainer: {
     position: 'absolute',  // Make the container absolute to position it at the bottom
-    bottom: 30,  // Adjusts how far from the bottom the button is
-    width: '80%',  // Button container takes up 80% of the screen width
+    bottom: 20,  // Adjusts how far from the bottom the button is
+    width: '60%',  // Button container takes up 80% of the screen width
     alignItems: 'center',  // Centers buttons horizontally
     paddingBottom: 30,  // Padding at the bottom
   },
   button: {
-    width: '100%',  // Button width as a percentage of the container width
+    width: '90%',  // Button width as a percentage of the container width
     marginBottom: 10,  // Spacing between buttons
   },
 });

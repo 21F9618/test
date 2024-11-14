@@ -1,5 +1,10 @@
 export { default as StartScreen } from "./StartScreen";
 export { default as LoginScreen } from "./LoginScreen";
-export { default as RegisterScreen } from "./RegisterScreen";
+export { default as RegisterScreenDonor } from "./RegisterScreenDonor";
+export { default as RegisterIndividualScreen } from "./RegisterIndividualScreen";
+export { default as RegisterNGOScreen } from "./RegisterNGOScreen";
 export { default as ResetPasswordScreen } from "./ResetPasswordScreen";
 export { default as HomeScreen } from "./HomeScreen";
+export { default as ChooseRole } from "./ChooseRole";
+export { default as WaitForApprovalScreen } from "./WaitForApprovalScreen";
+export { default as RChoose } from "./RChoose";

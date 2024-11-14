@@ -1,23 +1,18 @@
 import React, { useState } from "react";
-import { TouchableOpacity, StyleSheet, View } from "react-native";
-import { Text } from "react-native-paper";
-
-
-
-import Background from "../components/Background";
-import Logo from "../components/Logo";
-import Header from "../components/Header";
-import Button from "../components/Button";
+import { TouchableOpacity, StyleSheet, View, ImageBackground, Dimensions } from "react-native";
+import { Text, Button } from "react-native-paper";
 import TextInput from "../components/TextInput";
 import BackButton from "../components/BackButton";
 import { theme } from "../core/theme";
 import { emailValidator } from "../helpers/emailValidator";
 import { passwordValidator } from "../helpers/passwordValidator";
 
-export default function LoginScreen({ navigation }) {
+const screenWidth = Dimensions.get('window').width;
+
+export default function LoginScreen({ navigation, route }) {
   const [email, setEmail] = useState({ value: "", error: "" });
   const [password, setPassword] = useState({ value: "", error: "" });
-
+  const { role } = route.params;
   const onLoginPressed = () => {
     const emailError = emailValidator(email.value);
     const passwordError = passwordValidator(password.value);
@@ -32,70 +27,124 @@ export default function LoginScreen({ navigation }) {
     });
   };
 
+  const navigateToRegister = () => {
+    if (role === "recipient") {
+      navigation.navigate("RChoose");
+    } else if (role === "donor") {
+      navigation.navigate("");
+    } else {
+      navigation.navigate("WaitForApprovalScreen"); // Optional: for other roles
+    }
+  };
+
   return (
-    <Background>
+    <ImageBackground 
+      source={require('../../assets/items/0d59de270836b6eafe057c8afb642e77.jpg')} // Replace with your image path
+      style={styles.imageBackground}
+      blurRadius={8} // Adjust the blur intensity
+    >
       <BackButton goBack={navigation.goBack} />
-      <Logo />
-      <Header>Hello.</Header>
-      <TextInput
-        label="Email"
-        returnKeyType="next"
-        value={email.value}
-        onChangeText={(text) => setEmail({ value: text, error: "" })}
-        error={!!email.error}
-        errorText={email.error}
-        autoCapitalize="none"
-        autoCompleteType="email"
-        textContentType="emailAddress"
-        keyboardType="email-address"
-      />
-      <TextInput
-        label="Password"
-        returnKeyType="done"
-        value={password.value}
-        onChangeText={(text) => setPassword({ value: text, error: "" })}
-        error={!!password.error}
-        errorText={password.error}
-        secureTextEntry
-      />
-      <View style={styles.forgotPassword}>
-        <TouchableOpacity
-          onPress={() => navigation.navigate("ResetPasswordScreen")}
-        >
-          <Text style={styles.forgot}>Forgot your password ?</Text>
+      <View style={styles.container}>
+        
+        <Text style={styles.header}>Hello.</Text>
+        
+        <TextInput
+          label="Email"
+          mode="outlined"
+          style={styles.input}
+          value={email.value}
+          onChangeText={(text) => setEmail({ value: text, error: "" })}
+          error={!!email.error}
+          errorText={email.error}
+          autoCapitalize="none"
+          autoCompleteType="email"
+          textContentType="emailAddress"
+          keyboardType="email-address"
+        />
+        
+        <TextInput
+          label="Password"
+          mode="outlined"
+          style={styles.input}
+          value={password.value}
+          onChangeText={(text) => setPassword({ value: text, error: "" })}
+          error={!!password.error}
+          errorText={password.error}
+          secureTextEntry
+        />
+        
+        <TouchableOpacity onPress={() => navigation.navigate("ResetPasswordScreen")}>
+          <Text style={styles.forgotPassword}>Forgot your password?</Text>
         </TouchableOpacity>
+        
+        <Button mode="contained" onPress={onLoginPressed} style={styles.button}>
+          Log in
+        </Button>
+        
+        <View style={styles.footer}>
+          <Text style={styles.footerText}>Don't have an account yet?</Text>
+          <TouchableOpacity onPress={navigateToRegister}>
+            <Text style={styles.link}>Create one!</Text>
+          </TouchableOpacity>
+        </View>
       </View>
-      <Button mode="contained" onPress={onLoginPressed}>
-        Log in
-      </Button>
-      <View style={styles.row}>
-        <Text>You do not have an account yet ?</Text>
-      </View>
-      <View style={styles.row}>
-        <TouchableOpacity onPress={() => navigation.replace("RegisterScreen")}>
-          <Text style={styles.link}>Create !</Text>
-        </TouchableOpacity>
-      </View>
-    </Background>
+    </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
+  imageBackground: {
+    flex: 1,
+    justifyContent: 'center',
+    paddingHorizontal: 20,
+  },
+  container: {
+    alignItems: 'center',
+    backgroundColor: theme.colors.background, //'rgba(255, 255, 255, 0.65)', // Slightly transparent background for better readability
+    borderRadius: 30,
+    paddingVertical: 30,
+    paddingHorizontal: 20,
+  },
+  header: {
+    fontSize: 32,
+    fontWeight: 'bold',
+    marginBottom: 20,
+    color: theme.colors.sageGreen,
+    textShadowColor: theme.colors.background, // Outline color
+    textShadowOffset: { width: 2, height: 2 }, // Offset for the shadow
+    textShadowRadius: 1, // Spread for the shadow
+  },
+  input: {
+    alignSelf:'center',
+    width: '90%', // Responsive input width
+    marginBottom: 15,
+    backgroundColor: 'white', // Ensures clear visibility of input fields
+  },
   forgotPassword: {
-    width: "100%",
-    alignItems: "flex-end",
-    marginBottom: 10,
-  },
-  row: {
-    flexDirection: "row",
-    marginTop: 4,
-  },
-  forgot: {
     fontSize: 13,
-    color: theme.colors.secondary,
+    color: theme.colors.ivory,
+    marginTop: -10,
+    marginBottom: 20,
+  },
+  button: {
+    width: '90%', // Responsive button width
+    paddingVertical: 8,
+    borderRadius: 25,
+    marginTop: 10,
+  },
+  footer: {
+    flexDirection: 'row',
+    marginTop: 20,
+    alignItems: 'center',
+  },
+  footerText: {
+    fontSize: 13,
+    color: theme.colors.ivory,
   },
   link: {
-    fontWeight: "bold",
-    color: theme.colors.primary,
+    fontSize: 15,
+    fontWeight: 'bold',
+    color: theme.colors.sageGreen,
+    marginLeft: 5,
   },
 });
