@@ -1,6 +1,4 @@
 export { default as LoginScreen } from "./LoginScreen";
-export { default as RegisterScreen } from "./RegisterScreen";
-export { default as ResetPasswordScreen } from "./ResetPasswordScreen";
 export { default as DonorHomeScreen } from "./DonorHomeScreen";
 export { default as ScheduleDelivery } from "./ScheduleDelivery";
 export { default as Settings} from "./Settings";
