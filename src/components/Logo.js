@@ -4,7 +4,7 @@ import { Image, StyleSheet } from "react-native";
 export default function Logo() {
   return (
     <Image
-      source={require("../../assets/items/don1.jpg")}
+      source={require("../../assets/items/f1.jpeg")}
       style={styles.image}
     />
   );

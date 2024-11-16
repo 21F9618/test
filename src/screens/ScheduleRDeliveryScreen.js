@@ -12,7 +12,7 @@ const screenWidth = Dimensions.get('window').width;
 
 import DateTimePicker from "@react-native-community/datetimepicker";
 
-export default function ScheduleDelivery({ navigation }) {
+export default function ScheduleRDeliveryScreen({ navigation }) {
   const [selectedStartDate, setSelectedStartDate] = useState(null);
   const [pickupLocation, setPickupLocation] = useState("");
   const [dropOffLocation, setDropOffLocation] = useState("");
@@ -70,8 +70,12 @@ export default function ScheduleDelivery({ navigation }) {
             <DateTimePicker
               value={pickupTime}
               mode="time"
-              display="default"
+              display="spinner" // Use spinner for more color control
               onChange={onTimeChange}
+              themeVariant="dark" // Set theme variant
+              accentColor={theme.colors.sageGreen} // Apply custom color to the clock
+              // display="default"
+              // onChange={onTimeChange}
             />
           )}
           <Text style={styles.dateText}>Pickup Time: {pickupTime.toLocaleTimeString()}</Text>
@@ -183,5 +187,4 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
 });
-
 

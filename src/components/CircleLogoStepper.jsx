@@ -31,7 +31,7 @@ const CircleLogoStepper = () => {
       <View style={styles.step}>
         <View style={styles.circleContainer}>
           <View style={styles.circle}>
-            <Image source={require('../../assets/items/bookIC.png')} style={styles.categories} />
+            <Image source={require('../../assets/icon.png')} style={styles.categories} />
           </View>
           <Text style={styles.circleText}>Book</Text>
         </View>
@@ -41,7 +41,7 @@ const CircleLogoStepper = () => {
       <View style={styles.step}>
         <View style={styles.circleContainer}>
           <View style={styles.circle}>
-            <Image source={require('../../assets/items/bookIC.png')} style={styles.categories} />
+            <Image source={require('../../assets/icon.png')} style={styles.categories} />
           </View>
           <Text style={styles.circleText}>Confirm</Text>
         </View>

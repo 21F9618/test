@@ -7,6 +7,7 @@ export default function BackButton({ goBack }) {
     <TouchableOpacity onPress={goBack} style={styles.container}>
       <Image
         style={styles.image}
+        /////yahan per image ko white kerna back button key because changed to dark theme
         source={require("../../assets/items/back.png")}
       />
    

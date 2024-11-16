@@ -5,6 +5,7 @@ import { ChooseCategory, DonorHomeScreen, ScheduleDelivery,  UploadClothes, Uplo
 const Stack=createStackNavigator();
 const HomeStackNav = () => {
   return (
+    
     <Stack.Navigator >
         <Stack.Screen name='Start' component={DonorHomeScreen}    options={{headerShown:false} }/>
         <Stack.Screen name='ChooseCategory' component={ChooseCategory} options={{headerShown:false} }/>

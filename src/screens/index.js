@@ -9,7 +9,17 @@ export { default as UploadClothes} from "./UploadClothes";
 export { default as UploadEdu} from "./UploadEdu";
 
 
+export { default as ChooseRole } from "./ChooseRole";
+export { default as WaitForApprovalScreen } from "./WaitForApprovalScreen";
+export { default as RChoose } from "./RChoose";
 
+
+export { default as StartScreen } from "./StartScreen";
+export { default as RegisterScreenDonor } from "./RegisterScreenDonor";
+export { default as RegisterIndividualScreen } from "./RegisterIndividualScreen";
+export { default as RegisterNGOScreen } from "./RegisterNGOScreen";
+export { default as ResetPasswordScreen } from "./ResetPasswordScreen";
+export { default as  ScheduleRDeliveryScreen} from "./ScheduleRDeliveryScreen";
 //eishah nadeem screens:
 // Exporting all the screens from a single file for easy imports
 
