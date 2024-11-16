@@ -4,15 +4,8 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { theme } from "./src/core/theme";
 import {
-  ScheduleDelivery,
   LoginScreen,
-  RegisterScreen,
-  ResetPasswordScreen,
-  HomeScreen,
-  StartScreen,
-  Settings,
-  Profile,
-  ChooseCategory
+  
 } from "./src/screens";
 import TabNavigator from './src/navigator/TabNavigator';
 

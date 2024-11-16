@@ -4,9 +4,10 @@ import React from 'react';
 import { View, Text, Button, TouchableOpacity, StyleSheet, ScrollView, Image, Pressable } from 'react-native';
 import { theme } from "../core/theme";
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
-// import { LinearGradient } from 'expo-linear-gradient'
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
-const Home = ({ navigation }) => {
+
+const DonorHomeScreen = ({ navigation }) => {
   const tabBarHeight = useBottomTabBarHeight();
 
   return (
@@ -14,7 +15,7 @@ const Home = ({ navigation }) => {
     <View style={[Styles.container, { marginBottom: tabBarHeight }]}>
       <ScrollView>
         <View style={Styles.banner}>
-        <Image source={require('../../assets/items/d1.jpg') } style={{opacity:0.3, width:'100%', height:'100%',              position: 'relative'
+        <Image source={require('../../assets/items/don1.jpg') } style={{opacity:0.3, width:'100%', height:'100%',              position: 'relative'
         }} >
 
         </Image>
@@ -32,38 +33,41 @@ const Home = ({ navigation }) => {
         </View>
 
         <View style={{ color: theme.colors.ivory }}>
-          <Text style={Styles.headings}>Donations</Text>
-          <View style={{ flexDirection: 'row', justifyContent: 'center', width: '90%', marginTop:20, gap:20 }}>
-            <TouchableOpacity style={{alignItems:'center'}}>
-              <Image source={require('../../assets/items/bookIC.png')} style={Styles.categories} />
-              <Text style={{color:theme.colors.ivory, fontSize:15}}>Education</Text>
-            </TouchableOpacity>
+        <Text style={[Styles.headings, {marginTop:0}]}>Donations</Text>
 
-            <TouchableOpacity style={{alignItems:'center'}}>
-              <Image source={require('../../assets/items/clotheIC.png')} style={Styles.categories} />
-              <Text style={{color:theme.colors.ivory, fontSize:15}}>Clothes</Text>
-
-            </TouchableOpacity>
-
-            <TouchableOpacity style={{alignItems:'center'}}>
-              <Image source={require('../../assets/items/foodIC.png')} style={Styles.categories} />
-              <Text style={{color:theme.colors.ivory, fontSize:15}}>Food</Text>
-
-            </TouchableOpacity>
-
-            <TouchableOpacity style={{alignItems:'center'}}>
-              <Image source={require('../../assets/items/arrow.png')} style={Styles.categories} />
-              <Text style={{color:theme.colors.ivory, fontSize:15}}>View all</Text>
-
-            </TouchableOpacity>
-
-            
-          </View>
+        <View style={Styles.iconContainer}>
+                 
+                        <TouchableOpacity onPress={() => navigation.navigate('Education')}>
+                            <Icon
+                                name="school"
+                                size={40}
+                                color={theme.colors.sageGreen}
+                                style={Styles.icon}
+                            />
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={() => navigation.navigate('Clothes')}>
+                            <Icon
+                                name="checkroom"
+                                size={40}
+                                color={ theme.colors.sageGreen} // Highlight if on Clothing page
+                                style={Styles.icon} // Apply active style if on Clothing page
+                            />
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={() => navigation.navigate('Food')}>
+                            <Icon
+                                name="local-dining"
+                                size={40}
+                                color={theme.colors.sageGreen}
+                                style={Styles.icon}
+                            />
+                        </TouchableOpacity>
+                        
+                    </View>
         </View>
 
         <View style={Styles.hero}>
           <View>
-            <Image source={require('../../assets/items/d1.jpg')} style={{
+            <Image source={require('../../assets/items/don1.jpg')} style={{
               height: '100%',
               width: '100%',
               borderRadius: 20,
@@ -249,7 +253,19 @@ const Styles = StyleSheet.create({
     marginBottom: 8,
     position: 'relative',
     backgroundColor:theme.colors.sageGreen
-  }
+  },
+  iconContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center', // Center icons with minimal spacing
+    backgroundColor: theme.colors.charcoalBlack,
+},
+icon: {
+    backgroundColor: theme.colors.outerSpace,
+    padding: 10,
+    borderRadius: 25,
+    marginHorizontal: 5,
+    marginTop:5
+},
 });
 
-export default Home;
+export default DonorHomeScreen;

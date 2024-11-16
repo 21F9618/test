@@ -10,6 +10,10 @@ export const theme = {
     copper: '#B87333',
     pearlWhite: '#EAE0C8',
     ivory:  '#FFFFF0',
+    outerSpace: '#2D383A',     // Add any other missing colors
     TaupeBlack:'#2E2E2E'
+
+      
 },
+
 };
