@@ -7,40 +7,31 @@ const ItemDetail = ({ route, navigation }) => {
   const { item } = route.params;
   const [modalVisible, setModalVisible] = useState(false);
   const [confirmationVisible, setConfirmationVisible] = useState(false);
+  const [claimed, setClaimed] = useState(false); // State to track if the item is claimed
+  const [claimedItem, setClaimedItem] = useState(null); // State to store claimed item
 
   const handleClaim = () => {
     setModalVisible(true); // Show the modal
   };
-  
+
   const confirmClaim = () => {
     setModalVisible(false);
     setConfirmationVisible(true);
-
-    // Pass the claimed item to Cart screen via navigation
-    navigation.navigate('Cart', { 
-        newItem: { 
-            id: item.id, // Ensure unique ID
-            image: item.image, 
-            title: item.title, 
-            description: item.description 
-        } 
+    setClaimed(true); // Mark the item as claimed
+    setClaimedItem({ 
+      id: item.id, 
+      image: item.image, 
+      title: item.title, 
+      description: item.description 
     });
-};
-
-
-
-  // const confirmClaim = () => {
-  //   setModalVisible(false); // Close the modal
-  //   setConfirmationVisible(true); // Show success confirmation modal
-  // };
+  };
 
   const cancelClaim = () => {
     setModalVisible(false); // Close the modal if canceled
   };
 
   const goToCart = () => {
-    // Add navigation logic to cart screen if necessary
-    navigation.navigate('Cart'); // Assuming you have a 'Cart' screen
+    navigation.navigate('Cart', { claimedItem }); // Pass the claimed item to Cart screen
   };
 
   return (
@@ -58,8 +49,9 @@ const ItemDetail = ({ route, navigation }) => {
       <TouchableOpacity
         style={styles.claimButton}
         onPress={handleClaim} // Trigger the custom modal
+        disabled={claimed} // Disable the button if item is claimed
       >
-        <Text style={styles.claimButtonText}>Claim Item</Text>
+        <Text style={styles.claimButtonText}>{claimed ? 'Claimed' : 'Claim Item'}</Text>
       </TouchableOpacity>
 
       {/* Modal for claim confirmation */}
