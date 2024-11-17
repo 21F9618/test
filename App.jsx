@@ -13,22 +13,13 @@ import {
   Food,
   Clothes,
   ItemDetail,
-  DonationDetails,
+  
 } from "./src/screens";
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
-// Example of a nested navigator (Tab Navigator) for categories
-// function CategoryTabNavigator() {
-//   return (
-//     <Tab.Navigator>
-//       <Tab.Screen name="Education" component={Education} />
-//       <Tab.Screen name="Food" component={Food} />
-//       <Tab.Screen name="Clothes" component={Clothes} />
-//     </Tab.Navigator>
-//   );
-// }
+
 
 export default function App() {
   return (
@@ -42,18 +33,13 @@ export default function App() {
         >
           <Stack.Screen name="Welcome Recepient!" component={RecepientStartScreen} />
           
-          {/* Navigate to the Tab Navigator */}
-          {/* <Stack.Screen name="Categories" component={CategoryTabNavigator} /> */}
+         
           <Stack.Screen name="Clothes" component={Clothes} />
           <Stack.Screen name="Education" component={Education} />
           <Stack.Screen name="Food" component={Food} />
 
           <Stack.Screen name="ItemDetail" component={ItemDetail} />
-          <Stack.Screen
-            name="DonationDetails"
-            options={{ title: 'Donation Details' }}
-            component={DonationDetails}
-          />
+          
           <Stack.Screen name="Cart" component={Cart} />
 
         </Stack.Navigator>

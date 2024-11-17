@@ -7,31 +7,24 @@ const Cart = () => {
     const navigation = useNavigation();
     const route = useRoute();
 
-    const [cartItems, setCartItems] = useState([
-        {
-            id: '1',
-            image: require('../../assets/items/cloth1.jpg'),
-            title: 'Winter Jackets',
-            description: 'Warm jackets for cold weather, available in various sizes.',
-        },
-        {
-            id: '2',
-            image: require('../../assets/items/cloth1.jpg'),
-            title: 'T-Shirts',
-            description: 'Comfortable cotton t-shirts in different colors and sizes.',
-        },
-    ]);
+    // Initialize with an empty cart
+    const [cartItems, setCartItems] = useState([]);
 
+    // Effect to listen for new claimed items
     useEffect(() => {
         if (route.params?.newItem) {
+            // Add the new item to the cart
             setCartItems((prevItems) => [...prevItems, route.params.newItem]);
         }
     }, [route.params?.newItem]);
+    
 
-    const removeFromCart = (itemId) => {
-        setCartItems((prevItems) => prevItems.filter(item => item.id !== itemId));
+    // Remove item from the cart
+    const removeFromCart = (id) => {
+        setCartItems((prevItems) => prevItems.filter((item) => item.id !== id));
     };
 
+    // Render each cart item
     const renderCartItem = ({ item }) => (
         <View style={styles.cartItem}>
             <Image source={item.image} style={styles.itemImage} />
@@ -53,7 +46,7 @@ const Cart = () => {
             <FlatList
                 data={cartItems}
                 renderItem={renderCartItem}
-                keyExtractor={item => item.id}
+                keyExtractor={(item) => item.id}
                 contentContainerStyle={styles.cartList}
                 ListEmptyComponent={
                     <View style={styles.emptyContainer}>

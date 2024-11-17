@@ -11,11 +11,28 @@ const ItemDetail = ({ route, navigation }) => {
   const handleClaim = () => {
     setModalVisible(true); // Show the modal
   };
-
+  
   const confirmClaim = () => {
-    setModalVisible(false); // Close the modal
-    setConfirmationVisible(true); // Show success confirmation modal
-  };
+    setModalVisible(false);
+    setConfirmationVisible(true);
+
+    // Pass the claimed item to Cart screen via navigation
+    navigation.navigate('Cart', { 
+        newItem: { 
+            id: item.id, // Ensure unique ID
+            image: item.image, 
+            title: item.title, 
+            description: item.description 
+        } 
+    });
+};
+
+
+
+  // const confirmClaim = () => {
+  //   setModalVisible(false); // Close the modal
+  //   setConfirmationVisible(true); // Show success confirmation modal
+  // };
 
   const cancelClaim = () => {
     setModalVisible(false); // Close the modal if canceled
