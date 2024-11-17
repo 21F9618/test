@@ -40,8 +40,13 @@ export default function LoginScreen({ navigation, route }) {
       style={styles.imageBackground}
       blurRadius={8} // Adjust the blur intensity
     >
-      <BackButton goBack={navigation.goBack} />
+      <View style={styles.backButtonWrapper}>
+        <BackButton goBack={navigation.goBack} />
+      </View>
+      
+      {/* <BackButton goBack={navigation.goBack} /> */}
       <View style={styles.container}>
+      
         
         <Text style={styles.header}>Hello.</Text>
         
@@ -143,5 +148,11 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: theme.colors.sageGreen,
     marginLeft: 5,
+  },
+  backButtonWrapper: {
+    position: 'absolute',
+    top: 10, 
+    left: 30, 
+    padding: 10, 
   },
 });

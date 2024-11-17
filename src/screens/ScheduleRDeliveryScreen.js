@@ -2,22 +2,64 @@ import React, { useState } from "react";
 import Background from "../components/Background";
 import BackButton from "../components/BackButton";
 import CalendarPicker from "react-native-calendar-picker";
-import { StyleSheet, View, Text, TextInput, TouchableOpacity, ScrollView, KeyboardAvoidingView, Platform } from "react-native";
+import { StyleSheet, View, Text, TouchableOpacity, ScrollView, KeyboardAvoidingView, Platform ,Dimensions} from "react-native";
 import { theme } from  "../core/theme";
-import { Dimensions } from 'react-native';
 import Button from "../components/Button";
-
-// Get screen width
-const screenWidth = Dimensions.get('window').width;
-
+import MapPicker from "../components/MapPicker";
+import TextInput from "../components/TextInput";
 import DateTimePicker from "@react-native-community/datetimepicker";
+import axios from 'axios';
+
+
+
+
 
 export default function ScheduleRDeliveryScreen({ navigation }) {
   const [selectedStartDate, setSelectedStartDate] = useState(null);
   const [pickupLocation, setPickupLocation] = useState("");
   const [dropOffLocation, setDropOffLocation] = useState("");
+  const [error, setError] = useState(null); 
+  const [address, setAddress] = useState('');
   const [pickupTime, setPickupTime] = useState(new Date());
   const [showTimePicker, setShowTimePicker] = useState(false);
+
+  const [pickupCoordinates, setPickupCoordinates] = useState(null); // New state for pickup coordinates
+  const [dropOffCoordinates, setDropOffCoordinates] = useState(null);
+
+
+  const getAddressFromCoordinates = async (latitude, longitude) => {
+    const url = `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`;
+  
+    try {
+      const response = await axios.get(url, {
+        headers: {
+          'User-Agent': 'dast-e-khair/1.0 (zhalaym@gmaile.com)', // Replace with your app name and email
+        },
+      });
+  
+      const fetchedAddress = response.data.display_name;
+      // const filteredAddress = fetchedAddress.replace(/[^a-zA-Z0-9 ,.-]/g, '');
+      // const filteredAddress = fetchedAddress.replace(/[^a-zA-Z0-9,.-]/g, '').replace(/\s+/g, '');
+      const filteredAddress = fetchedAddress
+      .replace(/[^a-zA-Z0-9,.-]/g, '') // Remove unwanted characters
+      .replace(/\s+/g, '') // Remove spaces
+      .replace(/,+/g, ',') // Replace multiple consecutive commas with a single comma
+      .replace(/^,|,$/g, ''); // Remove leading or trailing commas
+
+      setAddress(filteredAddress);
+      console.log("Filtered Address:", filteredAddress);
+      return filteredAddress;
+    } catch (error) {
+      setError('Error fetching address');
+      console.error("Error fetching address:", error.message || error);
+      return 'Unknown Address';
+    }
+  };
+  
+  
+
+
+
 
   const onDateChange = (date) => setSelectedStartDate(date);
   const onTimeChange = (event, selectedTime) => {
@@ -27,25 +69,49 @@ export default function ScheduleRDeliveryScreen({ navigation }) {
 
   const startDate = selectedStartDate ? selectedStartDate.toString() : "";
 
+  const [isPickupMapVisible, setIsPickupMapVisible] = useState(false); // Separate state for pickup map visibility
+  const [isDropoffMapVisible, setIsDropoffMapVisible] = useState(false); 
+
+  const handleLocationSelect = async (location, type) => {
+    const address = await getAddressFromCoordinates(location.latitude, location.longitude); // Get address from coordinates
+    
+    console.log("this is the addddddd",address);
+    if (type === 'pickup') {
+      setPickupLocation(address);
+      setPickupCoordinates({ latitude: location.latitude, longitude: location.longitude });
+    } else if (type === 'dropoff') {
+      setDropOffLocation(address);
+      setDropOffCoordinates({ latitude: location.latitude, longitude: location.longitude });
+    }
+
+    // Hide the map after selection
+    setIsPickupMapVisible(false);
+    setIsDropoffMapVisible(false);
+  };
+
+  const handleCancel = () => {
+    setIsPickupMapVisible(false);
+    setIsDropoffMapVisible(false);
+  };
+
   return (
     <Background>
-      <BackButton goBack={navigation.goBack} />
-
-      <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === "ios" ? "padding" : null}>
+       <View style={styles.backButtonWrapper}>
+        <BackButton goBack={navigation.goBack} />
+      </View>
         <ScrollView contentContainerStyle={styles.scrollContainer}>
           <Text style={styles.header}>Select delivery specification</Text>
-
           {/* Wrapper for Calendar Picker with complete background coverage */}
           <View style={styles.calendarContainer}>
             <CalendarPicker
               onDateChange={onDateChange}
-              textStyle={styles.calendarText} // Apply custom text style
+              textStyle={styles.calendarText} 
               todayBackgroundColor={theme.colors.sageGreen}
               selectedDayColor={theme.colors.background}
               selectedDayTextColor="white"
               selectedBackgroundColor={theme.colors.sageGreen}
               width={260} // Adjust width to fit screen
-              height={350} 
+              height={300} 
               style={styles.calendar}  // Apply general calendar styling
             />
           </View>
@@ -87,6 +153,13 @@ export default function ScheduleRDeliveryScreen({ navigation }) {
             value={pickupLocation}
             onChangeText={(text) => setPickupLocation(text)}
           />
+           <Button
+            mode="contained"
+            onPress={() => setIsPickupMapVisible(true)}
+            style={styles.Button}
+          >
+            Select a Pickup Location on Map
+          </Button>
 
           <TextInput
             style={styles.input}
@@ -95,27 +168,46 @@ export default function ScheduleRDeliveryScreen({ navigation }) {
             value={dropOffLocation}
             onChangeText={(text) => setDropOffLocation(text)}
           />
+            <Button
+            mode="contained"
+            onPress={() => setIsDropoffMapVisible(true)}
+            style={styles.Button}
+          >
+            Select a drop off Location on Map
+          </Button>
+
+
+
+
+
+
+  
         </ScrollView>
-      </KeyboardAvoidingView>
+
+
+    
 
       <View style={styles.tabNavigatorPlaceholder}>
         <Text style={styles.tabNavigatorText}>Tab Navigator Placeholder</Text>
       </View>
+      {isPickupMapVisible && (
+        <View style={styles.mapOverlay}>
+          <MapPicker onLocationSelect={(location) => handleLocationSelect(location, "pickup")} onCancel={handleCancel} />
+        </View>
+      )}
+      {isDropoffMapVisible && (
+        <View style={styles.mapOverlay}>
+          <MapPicker onLocationSelect={(location) => handleLocationSelect(location, "dropoff")} onCancel={handleCancel} />
+        </View>
+      )}
     </Background>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-  },
   scrollContainer: {
     flexGrow: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: screenWidth * 0.01,
-    paddingBottom: 20,
+    paddingBottom: 30,
   },
   header: {
     fontSize: 24,
@@ -128,7 +220,7 @@ const styles = StyleSheet.create({
   calendarContainer: {
     backgroundColor: theme.colors.ivory,
     width: '100%',
-    height: '40%',
+    height: '30%',
     alignItems: 'center',
     marginBottom: 5,
     borderWidth: 4,
@@ -144,23 +236,15 @@ const styles = StyleSheet.create({
     fontSize: 14, // Change the font size for calendar dates
     color: theme.colors.background,
   },
-  input: {
-    width: "100%",
-    padding: 12,
-    marginVertical: 10,
-    borderWidth: 1,
-    borderColor: theme.colors.sageGreen,
-    borderRadius: 5,
-    backgroundColor: "white",
-  },
   dateContainer: {
     marginTop: 20,
-    alignItems: "center",
+    alignItems: "left",
   },
   dateText: {
     fontSize: 18,
     color: theme.colors.ivory,
-    textAlign: 'center',
+    textAlign: 'left',
+    paddingLeft:5,
   },
   timeButton: {
     marginTop: 20,
@@ -185,6 +269,28 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: 16,
     fontWeight: "bold",
+  },
+  input: {
+    width: "90%",
+    height: 25,
+    padding: 15,
+    borderWidth: 1,
+    borderColor: theme.colors.sageGreen,
+    borderRadius: 7,
+    backgroundColor: theme.colors.ivory,
+  },
+
+  mapOverlay: {
+    position: "absolute",
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
+  },
+  backButtonWrapper: {
+    position: 'absolute',
+    top: 5, 
+    left: 0, 
   },
 });
 
