@@ -4,23 +4,26 @@ import { Text, Button } from "react-native-paper";
 import TextInput from "../components/TextInput";
 import BackButton from "../components/BackButton";
 import { theme } from "../core/theme";
-import { emailValidator } from "../helpers/emailValidator";
+// import { emailValidator } from "../helpers/emailValidator";
 import { passwordValidator } from "../helpers/passwordValidator";
-
+import { phoneValidator } from "../helpers/phoneValidator";
 const screenWidth = Dimensions.get('window').width;
 
 export default function LoginScreen({ navigation, route }) {
-  const [email, setEmail] = useState({ value: "", error: "" });
+  // const [email, setEmail] = useState({ value: "", error: "" });
+  const [phone, setPhone] = useState({ value: "", error: "" });
   const [password, setPassword] = useState({ value: "", error: "" });
   const { role } = route.params;
-  const onLoginPressed = () => {
-    const emailError = emailValidator(email.value);
+  const onLoginPressed = async() => {
+    const phoneError = phoneValidator(phone.value);
+    // const emailError = emailValidator(email.value);
     const passwordError = passwordValidator(password.value);
-    if (emailError || passwordError) {
-      setEmail({ ...email, error: emailError });
-      setPassword({ ...password, error: passwordError });
-      return;
-    }
+    // if (emailError || passwordError) {
+    //   setEmail({ ...email, error: emailError });
+    //   setPassword({ ...password, error: passwordError });
+    //   return;
+    // }
+ 
     navigation.replace("TabNavigator");
   };
 
@@ -50,7 +53,7 @@ export default function LoginScreen({ navigation, route }) {
         
         <Text style={styles.header}>Hello.</Text>
         
-        <TextInput
+        {/* <TextInput
           label="Email"
           mode="outlined"
           style={styles.input}
@@ -62,7 +65,18 @@ export default function LoginScreen({ navigation, route }) {
           autoCompleteType="email"
           textContentType="emailAddress"
           keyboardType="email-address"
-        />
+        /> */}
+
+        <TextInput
+          label="Phone Number"
+          mode="outlined"
+          style={styles.input}
+          value={phone.value}
+          onChangeText={(text) => setPhone({ value: text, error: "" })}
+          error={!!phone.error}
+          errorText={phone.error}
+          keyboardType="phone-pad"
+        /> 
         
         <TextInput
           label="Password"
