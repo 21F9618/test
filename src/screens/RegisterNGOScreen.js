@@ -9,13 +9,15 @@ import Button from "../components/Button";
 import TextInput from "../components/TextInput";
 import BackButton from "../components/BackButton";
 import { theme } from "../core/theme";
-import { emailValidator } from "../helpers/emailValidator";
+// import { emailValidator } from "../helpers/emailValidator";
 import { passwordValidator } from "../helpers/passwordValidator";
 import { nameValidator } from "../helpers/nameValidator";
+import { phoneValidator } from "../helpers/phoneValidator";
 
 export default function RegisterNGOScreen({ navigation }) {
   const [name, setName] = useState({ value: "", error: "" });
-  const [email, setEmail] = useState({ value: "", error: "" });
+  // const [email, setEmail] = useState({ value: "", error: "" });
+  const [phone, setPhone] = useState({ value: "", error: "" });
   const [password, setPassword] = useState({ value: "", error: "" });
 
   // Define certificate state to store selected document
@@ -44,11 +46,13 @@ export default function RegisterNGOScreen({ navigation }) {
 
   const onSignUpPressed = () => {
     const nameError = nameValidator(name.value);
-    const emailError = emailValidator(email.value);
+    // const emailError = emailValidator(email.value);
+    const phoneError = phoneValidator(phone.value);
     const passwordError = passwordValidator(password.value);
-    if (emailError || passwordError || nameError) {
+    if (phoneError || passwordError || nameError) {
       setName({ ...name, error: nameError });
-      setEmail({ ...email, error: emailError });
+      setPhone({ ...phone, error: phoneError });
+      // setEmail({ ...email, error: emailError });
       setPassword({ ...password, error: passwordError });
       return;
     }
@@ -76,7 +80,7 @@ export default function RegisterNGOScreen({ navigation }) {
         error={!!name.error}
         errorText={name.error}
       />
-      <TextInput
+      {/* <TextInput
         label="Email"
         returnKeyType="next"
         value={email.value}
@@ -88,7 +92,21 @@ export default function RegisterNGOScreen({ navigation }) {
         autoCompleteType="email"
         textContentType="emailAddress"
         keyboardType="email-address"
-      />
+      /> */}
+
+      <TextInput
+          label="Phone Number"
+          mode="outlined"
+          style={styles.input}
+          value={phone.value}
+          onChangeText={(text) => setPhone({ value: text, error: "" })}
+          error={!!phone.error}
+          errorText={phone.error}
+          keyboardType="phone-pad"
+        />
+
+
+
       <TextInput
         label="Password"
         returnKeyType="done"
