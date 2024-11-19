@@ -2,19 +2,21 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, Modal } from 'react-native';
 import theme from '../core/theme';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import { useCart } from '../CartContext'; // Import useCart hook
+import { useCart } from '../CartContext';
 
 const ItemDetail = ({ route, navigation }) => {
   const { item } = route.params;
   const [modalVisible, setModalVisible] = useState(false);
   const [confirmationVisible, setConfirmationVisible] = useState(false);
-  const { addToCart } = useCart(); // Get addToCart function from CartContext
+  const [isClaimed, setIsClaimed] = useState(false); // State to track if the item is claimed
+  const { addToCart } = useCart();
 
   // Function to confirm the claim and add the item to the cart
   const confirmClaim = () => {
     setModalVisible(false);
     setConfirmationVisible(true);
-    addToCart(item); // Add item to cart
+    setIsClaimed(true); // Mark the item as claimed
+    addToCart(item);
   };
 
   // Function to navigate to the Cart screen
@@ -32,8 +34,14 @@ const ItemDetail = ({ route, navigation }) => {
       <Text style={styles.title}>{item.title}</Text>
       <Text style={styles.description}>{item.description}</Text>
 
-      <TouchableOpacity style={styles.claimButton} onPress={() => setModalVisible(true)}>
-        <Text style={styles.claimButtonText}>Claim Item</Text>
+      <TouchableOpacity
+        style={[styles.claimButton, isClaimed && styles.disabledClaimButton]}
+        onPress={() => !isClaimed && setModalVisible(true)}
+        disabled={isClaimed} // Disable button if item is claimed
+      >
+        <Text style={styles.claimButtonText}>
+          {isClaimed ? 'Claimed' : 'Claim Item'}
+        </Text>
       </TouchableOpacity>
 
       <Modal
@@ -88,8 +96,6 @@ const ItemDetail = ({ route, navigation }) => {
   );
 };
 
-
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -126,6 +132,9 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 30,
     borderRadius: 8,
+  },
+  disabledClaimButton: {
+    backgroundColor: theme.colors.outerSpace, // Greyed-out color
   },
   claimButtonText: {
     fontSize: 18,
