@@ -4,7 +4,7 @@ import theme from '../core/theme';
 import { useCart } from '../CartContext';
 
 const Cart = () => {
-  const { cartItems, removeFromCart } = useCart();
+  const { cartItems, removeFromCart } = useCart(); // Access cart context
 
   if (cartItems.length === 0) {
     return (
@@ -14,26 +14,29 @@ const Cart = () => {
     );
   }
 
+  const renderItem = ({ item }) => (
+    <View style={styles.itemRow}>
+      <Image source={item.image} style={styles.image} />
+      <View style={styles.detailsContainer}>
+        <Text style={styles.title}>{item.title}</Text>
+        <Text style={styles.description}>{item.description}</Text>
+      </View>
+      <TouchableOpacity
+        style={styles.removeButton}
+        onPress={() => removeFromCart(item.id)}
+      >
+        <Text style={styles.removeButtonText}>Remove</Text>
+      </TouchableOpacity>
+    </View>
+  );
+
   return (
     <View style={styles.container}>
       <FlatList
         data={cartItems}
-        keyExtractor={(item, index) => index.toString()}
-        renderItem={({ item }) => (
-          <View style={styles.itemRow}>
-            <Image source={item.image} style={styles.image} />
-            <View style={styles.detailsContainer}>
-              <Text style={styles.title}>{item.title}</Text>
-              <Text style={styles.description}>{item.description}</Text>
-            </View>
-            <TouchableOpacity
-              style={styles.removeButton}
-              onPress={() => removeFromCart(item.id)}
-            >
-              <Text style={styles.removeButtonText}>Remove</Text>
-            </TouchableOpacity>
-          </View>
-        )}
+        keyExtractor={(item) => item.id}
+        renderItem={renderItem}
+        contentContainerStyle={styles.list}
       />
     </View>
   );
@@ -43,15 +46,18 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: theme.colors.charcoalBlack,
-    padding: 10,
+    padding: 20,
+  },
+  list: {
+    paddingBottom: 20,
   },
   itemRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginVertical: 10,
     backgroundColor: theme.colors.outerSpace,
-    borderRadius: 10,
     padding: 10,
+    borderRadius: 10,
+    marginBottom: 10,
   },
   image: {
     width: 70,
@@ -71,7 +77,6 @@ const styles = StyleSheet.create({
   description: {
     fontSize: 14,
     color: theme.colors.pearlWhite,
-    marginTop: 5,
   },
   removeButton: {
     backgroundColor: theme.colors.sageGreen,

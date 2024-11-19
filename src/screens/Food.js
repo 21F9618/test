@@ -1,41 +1,44 @@
-import React from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image } from 'react-native';
+import React, { useContext } from 'react';
+import { View, Text, StyleSheet, Image, TouchableOpacity, FlatList } from 'react-native';
 import theme from '../core/theme';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import { CartContext } from '../CartContext'; // Correct import
 
-// Example items for the Food section with images
 const foodItems = [
     {
         id: '1',
-        image: require('../../assets/items/food1.jpg'), // Add the correct path to the image
-        title: 'Fruits',
-        description: 'Fresh fruits available for donation.',
+        image: require('../../assets/items/food1.jpg'),
+        title: 'Pasta',
+        description: 'Delicious and healthy pasta in various sauces.',
     },
     {
         id: '2',
-        image: require('../../assets/items/food1.jpg'), // Add the correct path to the image
-        title: 'Vegetables',
-        description: 'Donate fresh vegetables for the community.',
+        image: require('../../assets/items/food1.jpg'),
+        title: 'Salads',
+        description: 'Fresh salads with a variety of toppings.',
     },
     {
         id: '3',
-        image: require('../../assets/items/food1.jpg'), // Add the correct path to the image
-        title: 'Canned Goods',
-        description: 'Donate canned food items.',
+        image: require('../../assets/items/food1.jpg'),
+        title: 'Sandwiches',
+        description: 'Tasty sandwiches for a quick bite.',
     },
-    // Additional food items can be added here
+    // Additional food items...
 ];
 
 const Food = () => {
     const navigation = useNavigation();
-    const route = useRoute(); // Get the current route
+    const route = useRoute();
+    const { isInCart } = useContext(CartContext); // Access cart context
+
+    // Filter out items that are already in the cart
+    const visibleItems = foodItems.filter(item => !isInCart(item));
 
     const renderItem = ({ item }) => (
         <View style={styles.donationItem}>
             <Image source={item.image} style={styles.itemImage} />
             <Text style={styles.item}>{item.title}</Text>
-            {/* <Text style={styles.description}>{item.description}</Text> */}
             <TouchableOpacity
                 style={styles.claimButton}
                 onPress={() => navigation.navigate('ItemDetail', { item })}
@@ -45,12 +48,13 @@ const Food = () => {
         </View>
     );
 
-    const isFoodPage = route.name === 'Food'; // Check if the current route is 'Food'
+    // Check if the current route name is "Food"
+    const isFoodPage = route.name === 'Food';
 
     return (
         <View style={styles.container}>
             <FlatList
-                data={foodItems}
+                data={visibleItems}
                 renderItem={renderItem}
                 keyExtractor={item => item.id}
                 numColumns={2}
@@ -58,7 +62,6 @@ const Food = () => {
                 ListHeaderComponent={
                     <>
                         <View style={styles.iconContainer}>
-                            
                             <TouchableOpacity onPress={() => navigation.navigate('Education')}>
                                 <Icon
                                     name="school"
@@ -83,6 +86,7 @@ const Food = () => {
                                     style={[styles.icon, isFoodPage && styles.activeIcon]} // Apply active style if on Food page
                                 />
                             </TouchableOpacity>
+                            {/* Cart Icon */}
                             <TouchableOpacity onPress={() => navigation.navigate('Cart')}>
                                 <Icon
                                     name="shopping-cart"
@@ -102,95 +106,90 @@ const Food = () => {
     );
 };
 
+
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: theme.colors.charcoalBlack,
-    },
-    header: {
-        padding: 20,
-        alignItems: 'center',
-        borderBottomLeftRadius: 10,
-        borderBottomRightRadius: 10,
-    },
-    title: {
-        fontSize: 28,
-        color: theme.colors.ivory,
-        fontWeight: 'bold',
-    },
-    grid: {
-        justifyContent: 'space-between',
-        marginTop: 10,
-        padding: 10,
-    },
-    donationItem: {
-        backgroundColor: 'rgba(72, 72, 72, 0.8)',
-        padding: 15,
-        borderRadius: 10,
-        marginBottom: 20,
-        width: '45%',
-        alignItems: 'center',
-        marginHorizontal: '2.5%',
-        shadowColor: theme.colors.sageGreen,
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.5,
-        shadowRadius: 8,
-        borderWidth: 2,
-        borderColor: theme.colors.sageGreen,
-    },
-    itemImage: {
-        width: 150,
-        height: 150,
-        borderRadius: 8,
-        borderColor: theme.colors.sageGreen,
-        borderWidth: 3,
-        marginBottom: 10,
-    },
-    item: {
-        fontSize: 20,
-        color: theme.colors.ivory,
-        textAlign: 'center',
-        marginBottom: 10,
-    },
-    description: {
-        fontSize: 14,
-        color: theme.colors.ivory,
-        textAlign: 'center',
-        marginBottom: 10,
-    },
-    claimButton: {
-        backgroundColor: theme.colors.charcoalBlack,
-        paddingVertical: 10,
-        paddingHorizontal: 20,
-        borderColor: theme.colors.sageGreen,
-        borderBottomWidth: 8,
-        borderWidth: 3,
-        borderRadius: 20,
-        marginTop: 10,
-    },
-    claimButtonText: {
-        fontSize: 18,
-        color: theme.colors.ivory,
-        fontWeight: 'bold',
-    },
-    iconContainer: {
-        flexDirection: 'row',
-        justifyContent: 'center',
-        paddingVertical: 7,
-        backgroundColor: theme.colors.charcoalBlack,
-        borderBottomWidth: 1,
-        borderBottomColor: theme.colors.sageGreen,
-    },
-    icon: {
-        backgroundColor: theme.colors.outerSpace,
-        padding: 10,
-        borderRadius: 25,
-        marginHorizontal: 5,
-    },
-    activeIcon: {
-        backgroundColor: theme.colors.sageGreen,
-        padding: 12,
-    },
+  container: {
+    flex: 1,
+    backgroundColor: theme.colors.charcoalBlack,
+  },
+  header: {
+    padding: 20,
+    alignItems: 'center',
+    borderBottomLeftRadius: 10,
+    borderBottomRightRadius: 10,
+  },
+  title: {
+    fontSize: 28,
+    color: theme.colors.ivory,
+    fontWeight: 'bold',
+  },
+  grid: {
+    justifyContent: 'space-between',
+    marginTop: 10,
+    padding: 10,
+  },
+  donationItem: {
+    backgroundColor: 'rgba(72, 72, 72, 0.8)',
+    padding: 15,
+    borderRadius: 10,
+    marginBottom: 20,
+    width: '45%',
+    alignItems: 'center',
+    marginHorizontal: '2.5%',
+    shadowColor: theme.colors.sageGreen,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.5,
+    shadowRadius: 8,
+    borderWidth: 2,
+    borderColor: theme.colors.sageGreen,
+  },
+  itemImage: {
+    width: 150,
+    height: 150,
+    borderRadius: 8,
+    borderColor: theme.colors.sageGreen,
+    borderWidth: 3,
+    marginBottom: 10,
+  },
+  item: {
+    fontSize: 20,
+    color: theme.colors.ivory,
+    textAlign: 'center',
+    marginBottom: 10,
+  },
+  claimButton: {
+    backgroundColor: theme.colors.charcoalBlack,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderColor: theme.colors.sageGreen,
+    borderBottomWidth: 8,
+    borderWidth: 3,
+    borderRadius: 20,
+    marginTop: 10,
+  },
+  claimButtonText: {
+    fontSize: 18,
+    color: theme.colors.ivory,
+    fontWeight: 'bold',
+  },
+  iconContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    paddingVertical: 7,
+    backgroundColor: theme.colors.charcoalBlack,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colors.sageGreen,
+  },
+  icon: {
+    backgroundColor: theme.colors.outerSpace,
+    padding: 10,
+    borderRadius: 25,
+    marginHorizontal: 5,
+  },
+  activeIcon: {
+    backgroundColor: theme.colors.sageGreen,
+    padding: 12,
+  },
 });
 
 export default Food;

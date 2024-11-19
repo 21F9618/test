@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, FlatList } from 'react-native';
 import theme from '../core/theme';
-import { useNavigation, useRoute } from '@react-navigation/native'; // Import useRoute to check active page
+import { useNavigation, useRoute } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import { CartContext } from '../CartContext'; // Correct import
 
 const clothesItems = [
     {
@@ -23,11 +24,16 @@ const clothesItems = [
         title: 'Shoes',
         description: 'Durable shoes suitable for all occasions.',
     },
+    // Additional clothes items...
 ];
 
 const Clothes = () => {
     const navigation = useNavigation();
-    const route = useRoute(); // Get current route to identify the active screen
+    const route = useRoute();
+    const { isInCart } = useContext(CartContext); // Access cart context
+
+    // Filter out items that are already in the cart
+    const visibleItems = clothesItems.filter(item => !isInCart(item));
 
     const renderItem = ({ item }) => (
         <View style={styles.donationItem}>
@@ -35,66 +41,68 @@ const Clothes = () => {
             <Text style={styles.item}>{item.title}</Text>
             <TouchableOpacity
                 style={styles.claimButton}
-                onPress={() => navigation.navigate('ItemDetail', { item })} // Navigate to ItemDetail
+                onPress={() => navigation.navigate('ItemDetail', { item })}
             >
                 <Text style={styles.claimButtonText}>Claim</Text>
             </TouchableOpacity>
         </View>
     );
 
-    const isClothingPage = route.name === 'Clothes'; // Check if the current route is 'Clothes'
+    // Check if the current route name is "Clothes"
+    const isClothingPage = route.name === 'Clothes';
 
     return (
-        <FlatList
-            data={clothesItems}
-            renderItem={renderItem}
-            keyExtractor={item => item.id}
-            numColumns={2}
-            contentContainerStyle={styles.grid}
-            ListHeaderComponent={
-                <>
-                    <View style={styles.iconContainer}>
-                 
-                        <TouchableOpacity onPress={() => navigation.navigate('Education')}>
-                            <Icon
-                                name="school"
-                                size={40}
-                                color={theme.colors.sageGreen}
-                                style={styles.icon}
-                            />
-                        </TouchableOpacity>
-                        <TouchableOpacity onPress={() => navigation.navigate('Clothes')}>
-                            <Icon
-                                name="checkroom"
-                                size={40}
-                                color={isClothingPage ? theme.colors.ivory : theme.colors.sageGreen} // Highlight if on Clothing page
-                                style={[styles.icon, isClothingPage && styles.activeIcon]} // Apply active style if on Clothing page
-                            />
-                        </TouchableOpacity>
-                        <TouchableOpacity onPress={() => navigation.navigate('Food')}>
-                            <Icon
-                                name="local-dining"
-                                size={40}
-                                color={theme.colors.sageGreen}
-                                style={styles.icon}
-                            />
-                        </TouchableOpacity>
-                        {/* Cart Icon */}
-                        <TouchableOpacity onPress={() => navigation.navigate('Cart')}>
-                            <Icon
-                                name="shopping-cart"
-                                size={40}
-                                color={theme.colors.sageGreen}
-                                style={styles.icon}
-                            />
-                        </TouchableOpacity>
-                    </View>
-                    <View style={styles.header}>
-                        <Text style={styles.title}>Clothes Donations</Text>
-                    </View>
-                </>
-            }
-        />
+        <View style={styles.container}>
+            <FlatList
+                data={visibleItems}
+                renderItem={renderItem}
+                keyExtractor={item => item.id}
+                numColumns={2}
+                contentContainerStyle={styles.grid}
+                ListHeaderComponent={
+                    <>
+                        <View style={styles.iconContainer}>
+                            <TouchableOpacity onPress={() => navigation.navigate('Education')}>
+                                <Icon
+                                    name="school"
+                                    size={40}
+                                    color={theme.colors.sageGreen}
+                                    style={styles.icon}
+                                />
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={() => navigation.navigate('Clothes')}>
+                                <Icon
+                                    name="checkroom"
+                                    size={40}
+                                    color={isClothingPage ? theme.colors.ivory : theme.colors.sageGreen} // Highlight if on Clothing page
+                                    style={[styles.icon, isClothingPage && styles.activeIcon]} // Apply active style if on Clothing page
+                                />
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={() => navigation.navigate('Food')}>
+                                <Icon
+                                    name="local-dining"
+                                    size={40}
+                                    color={theme.colors.sageGreen}
+                                    style={styles.icon}
+                                />
+                            </TouchableOpacity>
+                            {/* Cart Icon */}
+                            <TouchableOpacity onPress={() => navigation.navigate('Cart')}>
+                                <Icon
+                                    name="shopping-cart"
+                                    size={40}
+                                    color={theme.colors.sageGreen}
+                                    style={styles.icon}
+                                />
+                            </TouchableOpacity>
+                        </View>
+                        <View style={styles.header}>
+                            <Text style={styles.title}>Clothes Donations</Text>
+                        </View>
+                    </>
+                }
+            />
+        </View>
     );
 };
 

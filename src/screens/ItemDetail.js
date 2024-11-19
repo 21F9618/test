@@ -2,21 +2,22 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, Modal } from 'react-native';
 import theme from '../core/theme';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import { useCart } from '../CartContext';
+import { useCart } from '../CartContext'; // Correct path
 
 const ItemDetail = ({ route, navigation }) => {
-  const { item } = route.params;
+  const { item } = route.params; // Ensure 'item' is passed correctly
   const [modalVisible, setModalVisible] = useState(false);
   const [confirmationVisible, setConfirmationVisible] = useState(false);
-  const [isClaimed, setIsClaimed] = useState(false); // State to track if the item is claimed
-  const { addToCart } = useCart();
+  const { addToCart, isInCart } = useCart(); // Access context functions
+
+  // Check if the item is already in the cart
+  const isClaimed = isInCart(item);
 
   // Function to confirm the claim and add the item to the cart
   const confirmClaim = () => {
     setModalVisible(false);
     setConfirmationVisible(true);
-    setIsClaimed(true); // Mark the item as claimed
-    addToCart(item);
+    addToCart(item); // Add item to cart
   };
 
   // Function to navigate to the Cart screen
@@ -26,29 +27,35 @@ const ItemDetail = ({ route, navigation }) => {
 
   return (
     <View style={styles.container}>
+      {/* Cart Icon */}
       <TouchableOpacity style={styles.cartIcon} onPress={goToCart}>
         <Icon name="shopping-cart" size={30} color={theme.colors.ivory} />
       </TouchableOpacity>
 
+      {/* Item Details */}
       <Image source={item.image} style={styles.image} />
+ 
+
       <Text style={styles.title}>{item.title}</Text>
       <Text style={styles.description}>{item.description}</Text>
 
+      {/* Claim Button */}
       <TouchableOpacity
         style={[styles.claimButton, isClaimed && styles.disabledClaimButton]}
         onPress={() => !isClaimed && setModalVisible(true)}
-        disabled={isClaimed} // Disable button if item is claimed
+        disabled={isClaimed} // Disable button if item is already claimed
       >
         <Text style={styles.claimButtonText}>
           {isClaimed ? 'Claimed' : 'Claim Item'}
         </Text>
       </TouchableOpacity>
 
+      {/* Claim Confirmation Modal */}
       <Modal
-        transparent={true}
+        transparent
         animationType="fade"
         visible={modalVisible}
-        onRequestClose={() => setModalVisible(false)}
+        onRequestClose={() => setModalVisible(false)} // Close on outside touch or back button
       >
         <View style={styles.modalBackground}>
           <View style={styles.modalContainer}>
@@ -74,11 +81,12 @@ const ItemDetail = ({ route, navigation }) => {
         </View>
       </Modal>
 
+      {/* Success Confirmation Modal */}
       <Modal
-        transparent={true}
+        transparent
         animationType="fade"
         visible={confirmationVisible}
-        onRequestClose={() => setConfirmationVisible(false)}
+        onRequestClose={() => setConfirmationVisible(false)} // Close on outside touch or back button
       >
         <View style={styles.modalBackground}>
           <View style={styles.successModalContainer}>
