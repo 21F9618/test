@@ -1,42 +1,29 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, Modal } from 'react-native';
 import theme from '../core/theme';
-import Icon from 'react-native-vector-icons/FontAwesome'; // Import the FontAwesome icon library
+import Icon from 'react-native-vector-icons/FontAwesome';
+import { useCart } from '../CartContext'; // Import useCart hook
 
 const ItemDetail = ({ route, navigation }) => {
   const { item } = route.params;
   const [modalVisible, setModalVisible] = useState(false);
   const [confirmationVisible, setConfirmationVisible] = useState(false);
-  const [claimed, setClaimed] = useState(false); // State to track if the item is claimed
-  const [claimedItem, setClaimedItem] = useState(null); // State to store claimed item
+  const { addToCart } = useCart(); // Get addToCart function from CartContext
 
-  const handleClaim = () => {
-    setModalVisible(true); // Show the modal
-  };
-
+  // Function to confirm the claim and add the item to the cart
   const confirmClaim = () => {
     setModalVisible(false);
     setConfirmationVisible(true);
-    setClaimed(true); // Mark the item as claimed
-    setClaimedItem({ 
-      id: item.id, 
-      image: item.image, 
-      title: item.title, 
-      description: item.description 
-    });
+    addToCart(item); // Add item to cart
   };
 
-  const cancelClaim = () => {
-    setModalVisible(false); // Close the modal if canceled
-  };
-
+  // Function to navigate to the Cart screen
   const goToCart = () => {
-    navigation.navigate('Cart', { claimedItem }); // Pass the claimed item to Cart screen
+    navigation.navigate('Cart');
   };
 
   return (
     <View style={styles.container}>
-      {/* Cart Icon at the top-right corner */}
       <TouchableOpacity style={styles.cartIcon} onPress={goToCart}>
         <Icon name="shopping-cart" size={30} color={theme.colors.ivory} />
       </TouchableOpacity>
@@ -45,21 +32,15 @@ const ItemDetail = ({ route, navigation }) => {
       <Text style={styles.title}>{item.title}</Text>
       <Text style={styles.description}>{item.description}</Text>
 
-      {/* Button to claim the item */}
-      <TouchableOpacity
-        style={styles.claimButton}
-        onPress={handleClaim} // Trigger the custom modal
-        disabled={claimed} // Disable the button if item is claimed
-      >
-        <Text style={styles.claimButtonText}>{claimed ? 'Claimed' : 'Claim Item'}</Text>
+      <TouchableOpacity style={styles.claimButton} onPress={() => setModalVisible(true)}>
+        <Text style={styles.claimButtonText}>Claim Item</Text>
       </TouchableOpacity>
 
-      {/* Modal for claim confirmation */}
       <Modal
         transparent={true}
         animationType="fade"
         visible={modalVisible}
-        onRequestClose={cancelClaim}
+        onRequestClose={() => setModalVisible(false)}
       >
         <View style={styles.modalBackground}>
           <View style={styles.modalContainer}>
@@ -67,15 +48,13 @@ const ItemDetail = ({ route, navigation }) => {
             <Text style={styles.modalText}>
               Are you sure you want to claim this item? It will be added to your bucket.
             </Text>
-
             <View style={styles.modalButtons}>
               <TouchableOpacity
                 style={[styles.modalButton, styles.cancelButton]}
-                onPress={cancelClaim}
+                onPress={() => setModalVisible(false)}
               >
                 <Text style={styles.modalButtonText}>No</Text>
               </TouchableOpacity>
-
               <TouchableOpacity
                 style={[styles.modalButton, styles.confirmButton]}
                 onPress={confirmClaim}
@@ -87,7 +66,6 @@ const ItemDetail = ({ route, navigation }) => {
         </View>
       </Modal>
 
-      {/* Success confirmation modal */}
       <Modal
         transparent={true}
         animationType="fade"
@@ -97,13 +75,9 @@ const ItemDetail = ({ route, navigation }) => {
         <View style={styles.modalBackground}>
           <View style={styles.successModalContainer}>
             <Text style={styles.successTitle}>Claim Successful!</Text>
-            <Text style={styles.successText}>
-              The item has been added to your bucket.
-            </Text>
-
             <TouchableOpacity
               style={styles.successButton}
-              onPress={() => setConfirmationVisible(false)} // Close the success modal
+              onPress={() => setConfirmationVisible(false)}
             >
               <Text style={styles.modalButtonText}>OK</Text>
             </TouchableOpacity>
@@ -113,6 +87,8 @@ const ItemDetail = ({ route, navigation }) => {
     </View>
   );
 };
+
+
 
 const styles = StyleSheet.create({
   container: {
