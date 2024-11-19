@@ -13,12 +13,14 @@ import { emailValidator } from "../helpers/emailValidator";
 import { passwordValidator } from "../helpers/passwordValidator";
 import { nameValidator } from "../helpers/nameValidator";
 import { idCardValidator } from "../helpers/idCardValidator";
+import { phoneValidator } from "../helpers/phoneValidator";
 
 export default function RegisterScreenDonor({ navigation }) {
   const [name, setName] = useState({ value: "", error: "" });
   const [email, setEmail] = useState({ value: "", error: "" });
   const [password, setPassword] = useState({ value: "", error: "" });
   const [idCard, setidCard] = useState({ value: "", error: "" });
+  const [phone, setPhone] = useState({ value: "", error: "" });
  
 
   
@@ -28,10 +30,11 @@ export default function RegisterScreenDonor({ navigation }) {
 
   const onSignUpPressed = () => {
     const nameError = nameValidator(name.value);
-    const emailError = emailValidator(email.value);
+    // const emailError = emailValidator(email.value);
+    const phoneError=phoneValidator(phone.value);
     const passwordError = passwordValidator(password.value);
     const idCardError = idCardValidator(idCard.value);
-    if (emailError || passwordError || nameError || idCardError) {
+    if (phoneError || passwordError || nameError || idCardError) {
       setName({ ...name, error: nameError });
       setEmail({ ...email, error: emailError });
       setPassword({ ...password, error: passwordError });
@@ -64,7 +67,7 @@ export default function RegisterScreenDonor({ navigation }) {
         error={!!name.error}
         errorText={name.error}
       />
-      <TextInput
+      {/* <TextInput
         label="Email"
         returnKeyType="next"
         value={email.value}
@@ -76,7 +79,17 @@ export default function RegisterScreenDonor({ navigation }) {
         autoCompleteType="email"
         textContentType="emailAddress"
         keyboardType="email-address"
-      />
+      /> */}
+       <TextInput
+          label="Phone Number"
+          mode="outlined"
+          style={styles.input}
+          value={phone.value}
+          onChangeText={(text) => setPhone({ value: text, error: "" })}
+          error={!!phone.error}
+          errorText={phone.error}
+          keyboardType="phone-pad"
+        />
       <TextInput
         label="Password"
         returnKeyType="done"
