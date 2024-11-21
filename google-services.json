@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "261463641468",
+    "project_id": "test-ab396",
+    "storage_bucket": "test-ab396.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:261463641468:android:5ecb6bf7d5b013259428f9",
+        "android_client_info": {
+          "package_name": "com.eishaq.DasteKhair"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCWl4eWx4fY6Cm6AnOToT1t4fCgNrlJ0bM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

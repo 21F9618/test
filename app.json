@@ -16,13 +16,34 @@
       "supportsTablet": true
     },
     "android": {
+      "googleServicesFile": "./google-services.json",
+
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.eishaq.DasteKhair"
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "custom photos permission",
+          "cameraPermission": "Allow $(PRODUCT_NAME) to open the camera",
+
+          "//": "Disables the microphone permission",
+          "microphonePermission": false
+        }
+      ],
+      ["@react-native-firebase/app", "@react-native-firebase/auth"]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "916cc282-9bb3-475b-b856-df2de78b0e53"
+      }
     }
   }
 }
