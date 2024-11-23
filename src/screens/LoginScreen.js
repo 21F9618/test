@@ -6,23 +6,53 @@ import BackButton from "../components/BackButton";
 import { theme } from "../core/theme";
 import { emailValidator } from "../helpers/emailValidator";
 import { passwordValidator } from "../helpers/passwordValidator";
+import auth from "@react-native-firebase/auth";
+import firestore from "@react-native-firebase/firestore";
 
 const screenWidth = Dimensions.get('window').width;
 
 export default function LoginScreen({ navigation, route }) {
   const [email, setEmail] = useState({ value: "", error: "" });
   const [password, setPassword] = useState({ value: "", error: "" });
+  const [phoneNumber,setPhoneNumber]=useState("");
+  const [code,setCode]=useState("");
+  const [confirm,setConfirm]=useState("");
   const { role } = route.params;
-  const onLoginPressed = () => {
-    const emailError = emailValidator(email.value);
-    const passwordError = passwordValidator(password.value);
-    if (emailError || passwordError) {
-      setEmail({ ...email, error: emailError });
-      setPassword({ ...password, error: passwordError });
-      return;
+  const onLoginPressed = async() => {
+
+    try{
+      const confirmation = await auth().signInWithPhoneNumber(phoneNumber);
+      console.log("in the try block");
+      setConfirm(confirmation);
+      console.log("after the confirmation");
+    }catch(error){
+      console.log("error sending code:",error);
+      
     }
     navigation.replace("TabNavigator");
   };
+
+  const confirmCode = async ()=>{
+    try{
+      const userCredential = await confirm.confirmCode(code);
+      const user=userCredential.user;
+
+      const userDocument=await firestore().collection('users').doc(user.uid).get();
+      if(userDocument.exists){
+        navigation.replace("TabNavigator");
+      }else{
+        navigation.navigate("RegisterScreenDonor",{uid:user.uid});
+        
+      }
+
+    }catch(error){
+      console.log("Invalid code",error);
+
+
+    }
+  };
+
+
 
   const navigateToRegister = () => {
     if (role === "recipient") {
@@ -30,7 +60,7 @@ export default function LoginScreen({ navigation, route }) {
     } else if (role === "donor") {
       navigation.navigate("RegisterScreenDonor");
     } else {
-      navigation.navigate("ScheduleRDeliveryScreen"); // Optional: for other roles
+      navigation.navigate("RChoose"); // Optional: for other roles
     }
   };
 
@@ -49,19 +79,13 @@ export default function LoginScreen({ navigation, route }) {
       
         
         <Text style={styles.header}>Hello.</Text>
-        
+        {!confirm ? (
+        <>
         <TextInput
-          label="Email"
-          mode="outlined"
-          style={styles.input}
-          value={email.value}
-          onChangeText={(text) => setEmail({ value: text, error: "" })}
-          error={!!email.error}
-          errorText={email.error}
-          autoCapitalize="none"
-          autoCompleteType="email"
-          textContentType="emailAddress"
-          keyboardType="email-address"
+          label="phoneNumber"
+          value={phoneNumber}
+          onChangeText={setPhoneNumber}
+
         />
         
         <TextInput
@@ -83,6 +107,25 @@ export default function LoginScreen({ navigation, route }) {
         <Button mode="contained" onPress={onLoginPressed} style={styles.button}>
           Log in
         </Button>
+        </>
+        ) : (
+          <>
+          <Text>Enter the code sent to your phone</Text>
+          <TextInput
+          label="code"
+          value={code}
+          onChangeText={setCode}
+
+        />
+        <TouchableOpacity onPress={(confirmCode)}>
+        <Text style={styles.forgotPassword}>confirm code</Text>
+      </TouchableOpacity>
+      </>
+  
+
+        )}
+
+
         
         <View style={styles.footer}>
           <Text style={styles.footerText}>Don't have an account yet?</Text>

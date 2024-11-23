@@ -13,12 +13,18 @@ import { emailValidator } from "../helpers/emailValidator";
 import { passwordValidator } from "../helpers/passwordValidator";
 import { nameValidator } from "../helpers/nameValidator";
 import { idCardValidator } from "../helpers/idCardValidator";
+import firestore from "@react-native-firebase/firestore";
 
-export default function RegisterScreenDonor({ navigation }) {
+
+export default function RegisterScreenDonor({ route,navigation }) {
+
   const [name, setName] = useState({ value: "", error: "" });
   const [email, setEmail] = useState({ value: "", error: "" });
   const [password, setPassword] = useState({ value: "", error: "" });
   const [idCard, setidCard] = useState({ value: "", error: "" });
+  const {uid} = route.params;
+
+
  
 
   
@@ -26,22 +32,28 @@ export default function RegisterScreenDonor({ navigation }) {
   // Handle the document pick and store the result in state
   
 
-  const onSignUpPressed = () => {
+  const onSignUpPressed = async() => {
     const nameError = nameValidator(name.value);
-    const emailError = emailValidator(email.value);
     const passwordError = passwordValidator(password.value);
     const idCardError = idCardValidator(idCard.value);
-    if (emailError || passwordError || nameError || idCardError) {
+    if (nameError || idCardError) {
       setName({ ...name, error: nameError });
-      setEmail({ ...email, error: emailError });
       setPassword({ ...password, error: passwordError });
       setidCard({ ...idCard, error: idCardError });
       return;
     }
-    navigation.reset({
-      index: 0,
-      routes: [{ name: "Start" }],
-    });
+    try{
+      await firestore().collection("users").doc(uid).set({name,idCard});
+
+      navigation.reset({
+        index: 0,
+        routes: [{ name: "WaitForApproval" }],
+      });
+
+    }catch(error){
+      console.log("error saving the details of the user",error);
+    }
+    
 
 
   };
