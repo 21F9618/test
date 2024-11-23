@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, Modal } from 'react-native';
-import theme from '../core/theme';
+import {theme} from '../core/theme';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { useCart } from '../CartContext'; // Correct path
 

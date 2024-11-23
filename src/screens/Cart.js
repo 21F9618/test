@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, FlatList, Image, TouchableOpacity } from 'react-native';
-import theme from '../core/theme';
+import {theme} from '../core/theme';
 import { useCart } from '../CartContext';
 
 const Cart = () => {
