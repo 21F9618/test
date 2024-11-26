@@ -8,4 +8,6 @@ export { default as ItemDetail } from './ItemDetail';
 export { default as Cart } from './Cart'; 
 export { default as HomeScreenRec} from './HomeScreenRec';
 export { default as Notifications} from './Notifications';
+export { default as ClaimsHistory} from './ClaimsHistory';
+export { default as Profile} from './Profile';
 

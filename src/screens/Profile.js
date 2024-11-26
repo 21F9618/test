@@ -1,7 +1,16 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView, Animated, Easing } from 'react-native';
-import { useNavigation } from '@react-navigation/native'; // For navigation
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Image,
+  ScrollView,
+  Animated,
+  Easing,
+} from 'react-native';
 import { theme } from '../core/theme'; // Importing custom theme
+import { useNavigation } from '@react-navigation/native';
 
 const Profile = () => {
   const navigation = useNavigation();
@@ -20,33 +29,47 @@ const Profile = () => {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.heading}>Recipient Profile</Text>
+      {/* Heading - No box background */}
+      <Text style={styles.headerTitle}>Recipient Profile</Text>
 
-      {/* Background Gradient */}
-      <View style={styles.backgroundContainer} />
-
-      {/* Profile Image with Animation */}
+      {/* Profile Section */}
       <View style={styles.profileContainer}>
-        <Animated.View style={[styles.profileImageContainer, { transform: [{ scale: imageScale }] }]}>
+        <Animated.View
+          style={[styles.profileImageContainer, { transform: [{ scale: imageScale }] }]}
+        >
           <Image
-            source={{ uri: 'https://via.placeholder.com/100' }} // Placeholder image for profile picture
+            source={{ uri: 'https://via.placeholder.com/120' }} // Placeholder image for profile picture
             style={styles.profileImage}
           />
         </Animated.View>
 
-        <Text style={styles.username}>Username</Text>
+        <Text style={styles.username}>John Doe</Text>
         <Text style={styles.khairPoints}>
           <Text style={styles.star}>★</Text> 100 Khair Points
         </Text>
-        <Text style={styles.phone}>Phone: 123-456-7890</Text>
-        <Text style={styles.email}>Email: user@example.com</Text>
-        <Text style={styles.totalClaims}>Total Claims: 5</Text>
+        <View style={styles.infoContainer}>
+          <Text style={styles.info}>Phone: 123-456-7890</Text>
+          <Text style={styles.info}>Email: user@example.com</Text>
+          <Text style={styles.info}>Total Claims: 5</Text>
+        </View>
       </View>
 
-      {/* Logout Button with Animation */}
-      <TouchableOpacity style={styles.logoutButton} onPress={() => {}}>
-        <Text style={styles.logoutText}>Logout</Text>
-      </TouchableOpacity>
+      {/* Buttons */}
+      <View style={styles.buttonsContainer}>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => navigation.navigate('ClaimsHistory')}
+        >
+          <Text style={styles.buttonText}>My Claims</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.button, styles.logoutButton]}
+          onPress={() => {}}
+        >
+          <Text style={[styles.buttonText, styles.logoutText]}>Logout</Text>
+        </TouchableOpacity>
+      </View>
     </ScrollView>
   );
 };
@@ -54,98 +77,100 @@ const Profile = () => {
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
-    backgroundColor: theme.colors.background,  // Background color for the whole screen
-    paddingTop: 60,
+    backgroundColor: theme.colors.background,
     paddingHorizontal: 20,
     alignItems: 'center',
   },
-  backgroundContainer: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    height: '100%',
-    backgroundColor: theme.colors.primary,  // Gradient-like color for background
-    opacity: 0.4,
-    borderRadius: 20,
-  },
-  heading: {
-    fontSize: 32,
+  // Removed box background for header
+  headerTitle: {
+    fontSize: 24,
     fontWeight: '700',
-    color: theme.colors.ivory,  // Using ivory for the heading text
-    marginBottom: 30,
+    color: theme.colors.ivory,
+    marginBottom: 20,
     textAlign: 'center',
   },
   profileContainer: {
     alignItems: 'center',
-    marginBottom: 40,
-    padding: 20,
-    backgroundColor: 'transparent',  // No card background, keeping it open
-  },
-  profileImageContainer: {
-    backgroundColor: theme.colors.primary,
-    padding: 8,
-    borderRadius: 60,
-    marginBottom: 20,
-    shadowColor: theme.colors.outerSpace,
-    shadowOffset: { width: 0, height: 5 },
-    shadowOpacity: 0.2,
-    shadowRadius: 12,
-    elevation: 8,
-  },
-  profileImage: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    borderWidth: 3,
-    borderColor: theme.colors.sageGreen,  // Border in sage green
-  },
-  username: {
-    fontSize: 26,
-    fontWeight: '800',
-    color: theme.colors.ivory,  // Ivory for username
-    marginBottom: 10,
-  },
-  khairPoints: {
-    fontSize: 20,
-    color: theme.colors.sageGreen,
-    marginBottom: 12,
-    fontWeight: '500',
-  },
-  star: {
-    color: theme.colors.copper,  // Copper for the star
-  },
-  phone: {
-    fontSize: 18,
-    color: theme.colors.ivory,
-    marginBottom: 8,
-  },
-  email: {
-    fontSize: 18,
-    color: theme.colors.ivory,
-    marginBottom: 8,
-  },
-  totalClaims: {
-    fontSize: 18,
-    color: theme.colors.ivory,
-    marginBottom: 25,
-  },
-  logoutButton: {
-    backgroundColor: theme.colors.sageGreen,
-    paddingVertical: 15,
-    paddingHorizontal: 35,
-    borderRadius: 10,
+    backgroundColor: theme.colors.outerSpace,
+    borderRadius: 20,
+    paddingVertical: 30,
+    paddingHorizontal: 20,
+    width: '100%',
     shadowColor: theme.colors.charcoalBlack,
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.2,
     shadowRadius: 8,
     elevation: 6,
-    transition: 'all 0.3s ease',  // Smooth transition effect
+    marginBottom: 30,
   },
-  logoutText: {
-    fontSize: 20,
+  profileImageContainer: {
+    marginBottom: 20,
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    overflow: 'hidden',
+    borderWidth: 4,
+    borderColor: theme.colors.sageGreen,
+  },
+  profileImage: {
+    width: '100%',
+    height: '100%',
+    resizeMode: 'cover',
+  },
+  username: {
+    fontSize: 22,
+    fontWeight: '700',
+    color: theme.colors.ivory,
+    marginBottom: 8,
+  },
+  khairPoints: {
+    fontSize: 18,
+    color: theme.colors.sageGreen,
+    marginBottom: 15,
+  },
+  star: {
+    fontSize: 22,
+    color: theme.colors.sageGreen,
+  },
+  infoContainer: {
+    alignItems: 'flex-start',
+    width: '100%',
+    marginTop: 10,
+  },
+  info: {
+    fontSize: 16,
+    color: theme.colors.ivory,
+    marginBottom: 6,
+  },
+  buttonsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+    marginBottom: 20,
+  },
+  button: {
+    flex: 1,
+    backgroundColor: theme.colors.sageGreen,
+    paddingVertical: 15,
+    marginHorizontal: 5,
+    borderRadius: 10,
+    alignItems: 'center',
+    shadowColor: theme.colors.charcoalBlack,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 6,
+    elevation: 4,
+  },
+  logoutButton: {
+    backgroundColor: theme.colors.outerSpace,
+  },
+  buttonText: {
+    fontSize: 18,
     color: theme.colors.ivory,
     fontWeight: '600',
+  },
+  logoutText: {
+    color: theme.colors.sageGreen,
   },
 });
 

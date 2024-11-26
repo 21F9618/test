@@ -2,8 +2,8 @@
 import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import Notifications from "../screens/Notifications";
-import Profile from "../screens/Profile";
 import Cart from "../screens/Cart";
+
 import { CartProvider } from '../CartContext'; // Import CartProvider
 
 import { View, Text, Button, TouchableOpacity, StyleSheet, ScrollView,Image } from 'react-native';
@@ -13,6 +13,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 
 import HomeStackNav from "./HomeStackNav";
+import History from "./History";
 
 const Tab = createBottomTabNavigator();
 
@@ -32,12 +33,16 @@ function TabNavigator() {
       <Tab.Screen name="Notifications" component={Notifications} options={{headerShown:false,
         tabBarIcon:({color})=> <Ionicons name="notifications" size={24} color={color} />
       } }/>
-      <Tab.Screen name="Profile" component={Profile} options={{headerShown:false,
-        tabBarIcon:({color})=> <MaterialCommunityIcons name="account" size={24} color={color} />
-      } }/>
+     
 <Tab.Screen name="Cart" component={Cart} options={{headerShown:false,
         tabBarIcon:({color})=> <Ionicons name="cart" size={24} color={color} />
       } }/>
+      <Tab.Screen name="History" component={History} options={{headerShown:false,
+        tabBarIcon:({color})=> <Entypo name="user" size={24} color={color} />
+      } }/>
+      
+        
+
     </Tab.Navigator>
     </CartProvider>
   );

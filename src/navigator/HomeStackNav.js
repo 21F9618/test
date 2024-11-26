@@ -1,7 +1,7 @@
 import { View, Text } from 'react-native'
 import React from 'react'
 import { createStackNavigator } from '@react-navigation/stack'
-import {Education,Clothes,Food,HomeScreenRec,ItemDetail,Notifications,RecepientStartScreen} from '../screens';
+import {Education,Clothes,Food,HomeScreenRec,ClaimsHistory,ItemDetail,Notifications,RecepientStartScreen} from '../screens';
 const Stack=createStackNavigator();
 const HomeStackNav = () => {
   return (
@@ -19,6 +19,11 @@ const HomeStackNav = () => {
               component={RecepientStartScreen}
               options={{ title: 'Welcome to Dast-e-Khair' }} // Optional: Customize header title
             />
+        {/* <Stack.Screen
+              name="ClaimsHistory"
+              component={ClaimsHistory}
+              options={{ title: 'ClaimsHistory' }} // Optional: Customize header title
+            /> */}
             <Stack.Screen
               name="Clothes"
               component={Clothes}
@@ -29,7 +34,6 @@ const HomeStackNav = () => {
               component={Education}
               options={{ title: 'Education Donations' }} // Optional: Customize header title
             />
-            <Stack.Screen name="Notifications" component={Notifications} />
 
             <Stack.Screen
               name="Food"
@@ -41,11 +45,8 @@ const HomeStackNav = () => {
               component={ItemDetail}
               options={{ title: 'Item Details' }} // Optional: Customize header title
             />
-            {/* <Stack.Screen
-              name="Cart"
-              component={Cart}
-              options={{ title: 'Your Cart' }} // Optional: Customize header title
-            /> */}
+
+           
 
 
 

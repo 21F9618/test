@@ -86,15 +86,14 @@ const Education = () => {
                                     style={styles.icon}
                                 />
                             </TouchableOpacity>
-                            {/* Cart Icon */}
-                            <TouchableOpacity onPress={() => navigation.navigate('Cart')}>
+                            {/* <TouchableOpacity onPress={() => navigation.navigate('Cart')}>
                                 <Icon
                                     name="shopping-cart"
                                     size={40}
                                     color={theme.colors.sageGreen}
                                     style={styles.icon}
                                 />
-                            </TouchableOpacity>
+                            </TouchableOpacity> */}
                         </View>
                         <View style={styles.header}>
                             <Text style={styles.title}>Education Donations</Text>

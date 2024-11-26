@@ -14,7 +14,7 @@ const HomeScreenRec = ({ navigation }) => {
     <View style={[Styles.container, { marginBottom: tabBarHeight }]}>
       <ScrollView>
         <View style={Styles.banner}>
-          <Image source={require('../../assets/items/poor.jpeg')} style={{ opacity: 0.3, width: '100%', height: '100%', position: 'relative' }} />
+          <Image source={require('../../assets/items/hi_rec.jpg')} style={{ opacity: 0.3, width: '100%', height: '100%', position: 'relative' }} />
 
           <Text style={Styles.heroText}>
             Hi {"\n"}Recepient!

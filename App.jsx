@@ -5,6 +5,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import { theme } from "./src/core/theme";
 
 import TabNavigator from './src/navigator/TabNavigator';
+import { ClaimsHistory } from "./src/screens";
 
 const Stack = createStackNavigator();
 
@@ -22,6 +23,7 @@ export default function App() {
             
             <Stack.Screen name="TabNavigator" component={TabNavigator} />
             
+            <Stack.Screen name="ClaimsHistory" component={ClaimsHistory} />
 
 
 

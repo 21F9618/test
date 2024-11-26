@@ -24,6 +24,18 @@ const foodItems = [
         title: 'Sandwiches',
         description: 'Tasty sandwiches for a quick bite.',
     },
+    {
+      id: '4',
+      image: require('../../assets/items/food1.jpg'),
+      title: 'Sandwiches',
+      description: 'Tasty sandwiches for a quick bite.',
+  },
+  {
+    id: '5',
+    image: require('../../assets/items/food1.jpg'),
+    title: 'Sandwiches',
+    description: 'Tasty sandwiches for a quick bite.',
+},
     // Additional food items...
 ];
 
@@ -86,15 +98,14 @@ const Food = () => {
                                     style={[styles.icon, isFoodPage && styles.activeIcon]} // Apply active style if on Food page
                                 />
                             </TouchableOpacity>
-                            {/* Cart Icon */}
-                            <TouchableOpacity onPress={() => navigation.navigate('Cart')}>
+                            {/* <TouchableOpacity onPress={() => navigation.navigate('Cart')}>
                                 <Icon
                                     name="shopping-cart"
                                     size={40}
                                     color={theme.colors.sageGreen}
                                     style={styles.icon}
                                 />
-                            </TouchableOpacity>
+                            </TouchableOpacity> */}
                         </View>
                         <View style={styles.header}>
                             <Text style={styles.title}>Food Donations</Text>
