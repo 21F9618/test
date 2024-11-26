@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "141731723618",
+    "project_id": "test-again-85a15",
+    "storage_bucket": "test-again-85a15.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:141731723618:android:c098c237e3b222b301143b",
+        "android_client_info": {
+          "package_name": "com.eishaq.DK"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBn992ub_MrDWBbmOT0mWplk1jKUg-rS6c"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

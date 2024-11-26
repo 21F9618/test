@@ -19,10 +19,34 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "googleServicesFile": "./google-services.json",
+
+      "package": "com.eishaq.DK"
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "14b5f93d-900c-4cab-94af-05ec6bac358a"
+      }
+    },
+    "plugins": ["@react-native-firebase/app", "@react-native-firebase/auth",
+    [
+      "expo-image-picker",
+      {
+        "photosPermission": "custom photos permission",
+        "cameraPermission": "Allow $(PRODUCT_NAME) to open the camera",
+
+        "//": "Disables the microphone permission",
+        "microphonePermission": false
+      }
+    ]
+  
+  
+  ]
+  
+
   }
 }
