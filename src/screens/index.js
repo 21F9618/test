@@ -13,6 +13,8 @@ export { default as ChooseRole } from "./ChooseRole";
 export { default as WaitForApprovalScreen } from "./WaitForApprovalScreen";
 export { default as RChoose } from "./RChoose";
 
+export {default as RiderHomeScreen} from "./RiderHomeScreen";
+
 
 export { default as StartScreen } from "./StartScreen";
 export { default as RegisterScreenDonor } from "./RegisterScreenDonor";

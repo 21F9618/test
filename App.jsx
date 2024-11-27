@@ -18,6 +18,7 @@ import {
 } from "./src/screens";
 import TabNavigator from './src/navigator/TabNavigator';
 import ScheduleRDeliveryScreen from "./src/screens/ScheduleRDeliveryScreen";
+import RiderHomeScreen from "./src/screens/RiderHomeScreen";
 
 const Stack = createStackNavigator();
 
@@ -30,7 +31,9 @@ export default function App() {
             headerShown: false,
           }}
         >
+<Stack.Screen name="RiderHomeScreen" component={RiderHomeScreen}/>
 <Stack.Screen name="StartScreen" component={StartScreen} />
+
 
 <Stack.Screen name="RChoose" component={RChoose} />         
 <Stack.Screen name="ChooseRole" component={ChooseRole} />
