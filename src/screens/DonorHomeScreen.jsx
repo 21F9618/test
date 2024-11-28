@@ -146,7 +146,7 @@ const DonorHomeScreen = ({ navigation }) => {
           </TouchableOpacity>
 
           <TouchableOpacity
-            onPress={() => navigation.navigate("Detail")}
+            onPress={() => navigation.navigate("ViewNgoPostsScreen")}
             style={Styles.CampCards}
           >
           <Image source={require('../../assets/items/ngo3.jpg')} style={{

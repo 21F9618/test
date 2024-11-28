@@ -9,9 +9,16 @@ export { default as UploadClothes} from "./UploadClothes";
 export { default as UploadEdu} from "./UploadEdu";
 
 
+
+export { default as ViewNgoPostsScreen} from "./ViewNgoPostsScreen";
+
+
+
+
 export { default as ChooseRole } from "./ChooseRole";
 export { default as WaitForApprovalScreen } from "./WaitForApprovalScreen";
 export { default as RChoose } from "./RChoose";
+
 
 export {default as RiderHomeScreen} from "./RiderHomeScreen";
 

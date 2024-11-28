@@ -14,6 +14,7 @@ import {
   ScheduleDelivery,
   StartScreen,
   WaitForApprovalScreen,
+  ViewNgoPostsScreen,
   
 } from "./src/screens";
 import TabNavigator from './src/navigator/TabNavigator';
@@ -31,9 +32,9 @@ export default function App() {
             headerShown: false,
           }}
         >
-<Stack.Screen name="RiderHomeScreen" component={RiderHomeScreen}/>
+<Stack.Screen name="ViewNgoPostsScreen" component={ViewNgoPostsScreen} />
 <Stack.Screen name="StartScreen" component={StartScreen} />
-
+<Stack.Screen name="RiderHomeScreen" component={RiderHomeScreen}/>
 
 <Stack.Screen name="RChoose" component={RChoose} />         
 <Stack.Screen name="ChooseRole" component={ChooseRole} />
