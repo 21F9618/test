@@ -1,43 +1,65 @@
 import React, { useContext } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, FlatList } from 'react-native';
-import {theme} from '../core/theme';
+import { theme } from '../core/theme';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import { CartContext } from '../CartContext'; // Correct import
+import { CartContext } from '../CartContext';
 
 const clothesItems = [
     {
         id: '1',
-        image: require('../../assets/items/cloth1.jpg'),
-        title: 'Winter Jackets',
-        description: 'Warm jackets for cold weather, available in various sizes.',
+        images: [
+            require('../../assets/items/cloth1.jpg'),
+            require('../../assets/items/cloth2.jpg'),
+            require('../../assets/items/clothes.jpg'),
+        ],
+        title: 'T-Shirt',
+        description: 'Comfortable cotton t-shirts in different colors.',
     },
     {
         id: '2',
-        image: require('../../assets/items/cloth1.jpg'),
-        title: 'T-Shirts',
-        description: 'Comfortable cotton t-shirts in different colors and sizes.',
+        images: [
+            require('../../assets/items/cloth1.jpg'),
+            require('../../assets/items/cloth2.jpg'),
+            require('../../assets/items/clothes.jpg'),
+        ],
+        title: 'Jeans',
+        description: 'Stylish and durable jeans in various sizes.',
     },
     {
         id: '3',
-        image: require('../../assets/items/cloth1.jpg'),
-        title: 'Shoes',
-        description: 'Durable shoes suitable for all occasions.',
+        images: [
+            require('../../assets/items/cloth1.jpg'),
+            require('../../assets/items/cloth2.jpg'),
+            require('../../assets/items/clothes.jpg'),
+        ],
+        title: 'Jacket',
+        description: 'Warm jackets for the winter season.',
     },
-    // Additional clothes items...
+    {
+        id: '4',
+        images: [
+            require('../../assets/items/cloth1.jpg'),
+            require('../../assets/items/cloth2.jpg'),
+            require('../../assets/items/clothes.jpg'),
+        ],
+        title: 'Dress',
+        description: 'Elegant dresses for special occasions.',
+    },
 ];
 
 const Clothes = () => {
     const navigation = useNavigation();
     const route = useRoute();
-    const { isInCart } = useContext(CartContext); // Access cart context
+    const { isInCart } = useContext(CartContext);
 
     // Filter out items that are already in the cart
     const visibleItems = clothesItems.filter(item => !isInCart(item));
 
     const renderItem = ({ item }) => (
         <View style={styles.donationItem}>
-            <Image source={item.image} style={styles.itemImage} />
+            {/* Display the first image */}
+            <Image source={item.images[0]} style={styles.itemImage} />
             <Text style={styles.item}>{item.title}</Text>
             <TouchableOpacity
                 style={styles.claimButton}
@@ -49,7 +71,7 @@ const Clothes = () => {
     );
 
     // Check if the current route name is "Clothes"
-    const isClothingPage = route.name === 'Clothes';
+    const isClothesPage = route.name === 'Clothes';
 
     return (
         <View style={styles.container}>
@@ -74,8 +96,8 @@ const Clothes = () => {
                                 <Icon
                                     name="checkroom"
                                     size={40}
-                                    color={isClothingPage ? theme.colors.ivory : theme.colors.sageGreen} // Highlight if on Clothing page
-                                    style={[styles.icon, isClothingPage && styles.activeIcon]} // Apply active style if on Clothing page
+                                    color={isClothesPage ? theme.colors.ivory : theme.colors.sageGreen}
+                                    style={[styles.icon, isClothesPage && styles.activeIcon]}
                                 />
                             </TouchableOpacity>
                             <TouchableOpacity onPress={() => navigation.navigate('Food')}>
@@ -86,14 +108,6 @@ const Clothes = () => {
                                     style={styles.icon}
                                 />
                             </TouchableOpacity>
-                            {/* <TouchableOpacity onPress={() => navigation.navigate('Cart')}>
-                                <Icon
-                                    name="shopping-cart"
-                                    size={40}
-                                    color={theme.colors.sageGreen}
-                                    style={styles.icon}
-                                />
-                            </TouchableOpacity> */}
                         </View>
                         <View style={styles.header}>
                             <Text style={styles.title}>Clothes Donations</Text>
@@ -108,28 +122,26 @@ const Clothes = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: theme.colors.charcoalBlack, // Dark background color for the whole page
+        backgroundColor: theme.colors.charcoalBlack,
     },
     header: {
-        backgroundColor: theme.colors.charcoalBlack, // Dark background for header
-        padding: 28,
+        padding: 20,
         alignItems: 'center',
         borderBottomLeftRadius: 10,
         borderBottomRightRadius: 10,
     },
     title: {
         fontSize: 28,
-        color: theme.colors.ivory, // White color for title
+        color: theme.colors.ivory,
         fontWeight: 'bold',
     },
     grid: {
         justifyContent: 'space-between',
         marginTop: 10,
-        backgroundColor: theme.colors.charcoalBlack,
         padding: 10,
     },
     donationItem: {
-        backgroundColor: theme.colors.outerSpace, // Light background for items
+        backgroundColor: 'rgba(72, 72, 72, 0.8)',
         padding: 15,
         borderRadius: 10,
         marginBottom: 20,
@@ -153,34 +165,28 @@ const styles = StyleSheet.create({
     },
     item: {
         fontSize: 20,
-        color: theme.colors.ivory, // Dark text color for item title
+        color: theme.colors.ivory,
         textAlign: 'center',
         marginBottom: 10,
-    },
-    itemDescription: {
-        fontSize: 16,
-        color: theme.colors.charcoalBlack, // Dark text for description
-        textAlign: 'center',
-        marginBottom: 15,
     },
     claimButton: {
         backgroundColor: theme.colors.charcoalBlack,
         paddingVertical: 10,
         paddingHorizontal: 20,
-        borderRadius: 20,
+        borderColor: theme.colors.sageGreen,
         borderBottomWidth: 8,
         borderWidth: 3,
-        borderColor: theme.colors.sageGreen,
+        borderRadius: 20,
         marginTop: 10,
     },
     claimButtonText: {
         fontSize: 18,
-        color: theme.colors.ivory, // White text for claim button
+        color: theme.colors.ivory,
         fontWeight: 'bold',
     },
     iconContainer: {
         flexDirection: 'row',
-        justifyContent: 'center', // Center icons with minimal spacing
+        justifyContent: 'center',
         paddingVertical: 7,
         backgroundColor: theme.colors.charcoalBlack,
         borderBottomWidth: 1,
@@ -193,8 +199,8 @@ const styles = StyleSheet.create({
         marginHorizontal: 5,
     },
     activeIcon: {
-        backgroundColor: theme.colors.sageGreen, // Change background for active icon
-        padding: 12, // Increase padding for highlighted effect
+        backgroundColor: theme.colors.sageGreen,
+        padding: 12,
     },
 });
 

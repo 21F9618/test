@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, FlatList } from 'react-native';
-import {theme} from '../core/theme';
+import { theme } from '../core/theme';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { CartContext } from '../CartContext'; // Correct import
@@ -8,36 +8,48 @@ import { CartContext } from '../CartContext'; // Correct import
 const educationItems = [
     {
         id: '1',
-        image: require('../../assets/items/STATIONARY.jpg'),
+        images: [
+            require('../../assets/items/STATIONARY.jpg'),
+            require('../../assets/items/D1.jpg'),
+            require('../../assets/items/STATIONARY.jpg'),
+        ],
         title: 'Textbooks',
         description: 'Useful textbooks for various subjects.',
     },
     {
         id: '2',
-        image: require('../../assets/items/STATIONARY.jpg'),
+        images: [
+            require('../../assets/items/STATIONARY.jpg'),
+            require('../../assets/items/STATIONARY.jpg'),
+            require('../../assets/items/STATIONARY.jpg'),
+        ],
         title: 'Notebooks',
         description: 'High-quality notebooks for students.',
     },
     {
         id: '3',
-        image: require('../../assets/items/D1.jpg'),
+        images: [
+            require('../../assets/items/STATIONARY.jpg'),
+            require('../../assets/items/STATIONARY.jpg'),
+            require('../../assets/items/STATIONARY.jpg'),
+        ],
         title: 'Pens and Pencils',
         description: 'Reliable pens and pencils for everyday use.',
     },
-    // Additional education items...
 ];
 
 const Education = () => {
     const navigation = useNavigation();
     const route = useRoute();
-    const { isInCart } = useContext(CartContext); // Access cart context
+    const { isInCart } = useContext(CartContext);
 
     // Filter out items that are already in the cart
     const visibleItems = educationItems.filter(item => !isInCart(item));
 
     const renderItem = ({ item }) => (
         <View style={styles.donationItem}>
-            <Image source={item.image} style={styles.itemImage} />
+            {/* Display only the first image */}
+            <Image source={item.images[0]} style={styles.itemImage} />
             <Text style={styles.item}>{item.title}</Text>
             <TouchableOpacity
                 style={styles.claimButton}
@@ -66,8 +78,8 @@ const Education = () => {
                                 <Icon
                                     name="school"
                                     size={40}
-                                    color={isEducationPage ? theme.colors.ivory : theme.colors.sageGreen} // Highlight if on Education page
-                                    style={[styles.icon, isEducationPage && styles.activeIcon]} // Apply active style if on Education page
+                                    color={isEducationPage ? theme.colors.ivory : theme.colors.sageGreen}
+                                    style={[styles.icon, isEducationPage && styles.activeIcon]}
                                 />
                             </TouchableOpacity>
                             <TouchableOpacity onPress={() => navigation.navigate('Clothes')}>
@@ -86,14 +98,6 @@ const Education = () => {
                                     style={styles.icon}
                                 />
                             </TouchableOpacity>
-                            {/* <TouchableOpacity onPress={() => navigation.navigate('Cart')}>
-                                <Icon
-                                    name="shopping-cart"
-                                    size={40}
-                                    color={theme.colors.sageGreen}
-                                    style={styles.icon}
-                                />
-                            </TouchableOpacity> */}
                         </View>
                         <View style={styles.header}>
                             <Text style={styles.title}>Education Donations</Text>
@@ -104,6 +108,9 @@ const Education = () => {
         </View>
     );
 };
+
+
+
 
 const styles = StyleSheet.create({
   container: {
