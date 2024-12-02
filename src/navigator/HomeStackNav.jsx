@@ -1,7 +1,8 @@
 import { View, Text } from 'react-native'
 import React from 'react'
 import { createStackNavigator } from '@react-navigation/stack'
-import { ChooseCategory, DonorHomeScreen, ScheduleDelivery,  UploadClothes, UploadEdu, UploadFood,ViewNgoPostsScreen,NgoPostDetailsScreen } from '../screens';
+import { ChooseCategory, DonorHomeScreen, ScheduleDelivery,  UploadClothes, UploadEdu, UploadFood,ViewNgoPostsScreen,NgoPostDetailsScreen, DonorProfileForm } from '../screens';
+import RecipientProfileForm from '../screens/RecipientProfileForm';
 const Stack=createStackNavigator();
 const HomeStackNav = () => {
   return (
@@ -14,6 +15,8 @@ const HomeStackNav = () => {
         <Stack.Screen name='UploadClothes' component={UploadClothes} options={{headerShown:false} }/>
         <Stack.Screen name='UploadEdu' component={UploadEdu} options={{headerShown:false} }/>
         <Stack.Screen name='ViewNgoPostsScreen' component={ViewNgoPostsScreen} options={{headerShown:false} }/>
+        <Stack.Screen name='DonorProfileForm' component={DonorProfileForm} options={{headerShown:false}}/>
+        <Stack.Screen name='RecipientProfileForm' component={RecipientProfileForm} options={{headerShown:false}}/>
       
 
 

@@ -21,6 +21,7 @@ import TabNavigator from './src/navigator/TabNavigator';
 import ScheduleRDeliveryScreen from "./src/screens/ScheduleRDeliveryScreen";
 import RiderHomeScreen from "./src/screens/RiderHomeScreen";
 import NgoPostDetailsScreen from "./src/screens/NgoPostDetailsScreen";
+import DonorProfileForm from "./src/screens/DonorProfileForm";
 
 const Stack = createStackNavigator();
 
@@ -33,10 +34,13 @@ export default function App() {
             headerShown: false,
           }}
         >
-<Stack.Screen name="ViewNgoPostsScreen" component={ViewNgoPostsScreen} />
 <Stack.Screen name="StartScreen" component={StartScreen} />
+<Stack.Screen name="ViewNgoPostsScreen" component={ViewNgoPostsScreen} />
+
 <Stack.Screen name="RiderHomeScreen" component={RiderHomeScreen}/>
 <Stack.Screen name="NgoPostDetailsScreen" component={NgoPostDetailsScreen}/>
+
+
 
 <Stack.Screen name="RChoose" component={RChoose} />         
 <Stack.Screen name="ChooseRole" component={ChooseRole} />

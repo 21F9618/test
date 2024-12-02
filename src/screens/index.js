@@ -12,6 +12,7 @@ export { default as UploadEdu} from "./UploadEdu";
 
 export { default as ViewNgoPostsScreen} from "./ViewNgoPostsScreen";
 
+export{default as DonorProfileForm} from "./DonorProfileForm";
 
 
 
