@@ -227,7 +227,7 @@ const RecipientProfileForm = () => {
                     <Text style={styles.label}>Educationl Level</Text>
                     <View style={styles.pickerContainer}>
                       <Picker
-                        selectedValue={values.}
+                        selectedValue={values.educationLevel}
                         onValueChange={(itemValue) => setFieldValue('educationLevel', itemValue)}
                         style={styles.picker}
                       >

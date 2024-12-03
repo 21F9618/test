@@ -12,8 +12,22 @@ const DonorProfileForm = ({ navigation }) => {
   const genderOptions = ['Male', 'Female', 'Other'];
   const provinceOptions = ['Punjab', 'Kashmir', 'Sindh', 'KPK', 'Blochistan'];
 
-  const onSubmit = (values) => {
+  const validate = (values) => {
+    const errors = {};
+    if (!values.name) errors.name = 'Name is required';
+    if (!values.age) errors.age = 'Age is required';
+    if (isNaN(values.age)) errors.age = 'Age must be a number';
+    if (!values.gender) errors.gender = 'Gender is required';
+    if (!values.occupation) errors.occupation = 'Occupation is required';
+    if (!values.address) errors.address = 'Address is required';
+    if (!values.province) errors.province = 'Province is required';
+    if (!image) errors.image = 'Profile picture is required';
+    return errors;
+  };
+
+  const onSubmit = (values, { setSubmitting }) => {
     console.log(values);
+    setSubmitting(false);
   };
 
   return (
@@ -27,13 +41,14 @@ const DonorProfileForm = ({ navigation }) => {
             name: '',
             gender: '',
             occupation: '',
-            age:'',
+            age: '',
             address: '',
             province: '',
           }}
+          validate={validate}
           onSubmit={onSubmit}
         >
-          {({ handleChange, handleBlur, handleSubmit, values, setFieldValue }) => (
+          {({ handleChange, handleBlur, handleSubmit, values, errors, touched, setFieldValue }) => (
             <>
               {/* Name Input */}
               <View style={styles.inputContainer}>
@@ -46,10 +61,11 @@ const DonorProfileForm = ({ navigation }) => {
                   placeholder="Enter your full name"
                   placeholderTextColor={theme.colors.ivory}
                 />
+                {errors.name && touched.name && <Text style={styles.errorText}>{errors.name}</Text>}
               </View>
 
-               {/* Age Input */}
-               <View style={styles.inputContainer}>
+              {/* Age Input */}
+              <View style={styles.inputContainer}>
                 <Text style={styles.label}>Age</Text>
                 <TextInput
                   style={styles.input}
@@ -58,7 +74,9 @@ const DonorProfileForm = ({ navigation }) => {
                   value={values.age}
                   placeholder="Enter Age"
                   placeholderTextColor={theme.colors.ivory}
+                  keyboardType="numeric"
                 />
+                {errors.age && touched.age && <Text style={styles.errorText}>{errors.age}</Text>}
               </View>
 
               {/* Gender Selection */}
@@ -81,6 +99,7 @@ const DonorProfileForm = ({ navigation }) => {
                     </TouchableOpacity>
                   ))}
                 </View>
+                {errors.gender && touched.gender && <Text style={styles.errorText}>{errors.gender}</Text>}
               </View>
 
               {/* Occupation Input */}
@@ -94,8 +113,8 @@ const DonorProfileForm = ({ navigation }) => {
                   placeholder="Enter your occupation"
                   placeholderTextColor={theme.colors.ivory}
                 />
+                {errors.occupation && touched.occupation && <Text style={styles.errorText}>{errors.occupation}</Text>}
               </View>
-
 
               {/* Address Input */}
               <View style={styles.inputContainer}>
@@ -110,6 +129,7 @@ const DonorProfileForm = ({ navigation }) => {
                   multiline
                   numberOfLines={3}
                 />
+                {errors.address && touched.address && <Text style={styles.errorText}>{errors.address}</Text>}
               </View>
               
               {/* Province Input */}
@@ -127,8 +147,8 @@ const DonorProfileForm = ({ navigation }) => {
                     ))}
                   </Picker>
                 </View>
+                {errors.province && touched.province && <Text style={styles.errorText}>{errors.province}</Text>}
               </View>
-            
 
               {/* Profile Picture Upload */}
               <View style={styles.inputContainer}>
@@ -138,6 +158,7 @@ const DonorProfileForm = ({ navigation }) => {
                   selectedImages={image ? [image] : []}
                   onImagesChange={(images) => setImage(images[0])}
                 />
+                {errors.image && <Text style={styles.errorText}>{errors.image}</Text>}
               </View>
 
               {/* Submit Button */}
@@ -248,6 +269,11 @@ const styles = StyleSheet.create({
     color: theme.colors.ivory,
     fontWeight: 'bold',
     fontSize: 18,
+  },
+  errorText: {
+    color: 'red',
+    fontSize: 12,
+    marginTop: 5,
   },
 });
 
