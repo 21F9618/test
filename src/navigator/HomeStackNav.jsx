@@ -3,6 +3,7 @@ import React from 'react'
 import { createStackNavigator } from '@react-navigation/stack'
 import { ChooseCategory, DonorHomeScreen, ScheduleDelivery,  UploadClothes, UploadEdu, UploadFood,ViewNgoPostsScreen,NgoPostDetailsScreen, DonorProfileForm } from '../screens';
 import RecipientProfileForm from '../screens/RecipientProfileForm';
+import NGOCampaignForm from '../screens/NGOCampaignForm';
 const Stack=createStackNavigator();
 const HomeStackNav = () => {
   return (
@@ -17,6 +18,7 @@ const HomeStackNav = () => {
         <Stack.Screen name='ViewNgoPostsScreen' component={ViewNgoPostsScreen} options={{headerShown:false} }/>
         <Stack.Screen name='DonorProfileForm' component={DonorProfileForm} options={{headerShown:false}}/>
         <Stack.Screen name='RecipientProfileForm' component={RecipientProfileForm} options={{headerShown:false}}/>
+        <Stack.Screen name='NGOCampaignForm' component={NGOCampaignForm} options={{headerShown:false}}/>
       
 
 

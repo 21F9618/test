@@ -82,7 +82,7 @@ const DonorHomeScreen = ({ navigation }) => {
                 Styles.heroBttn,
                 { backgroundColor: pressed ? theme.colors.sageGreen : 'rgba(0, 0, 0, 0.5)' } // Changes to sage green when pressed
               ]}
-              onPress={() => navigation.navigate('DonorProfileForm')}
+              onPress={() => navigation.navigate('NGOCampaignForm')}
             >
               <Text style={{ color: 'white', fontSize: 16 }}>Donate Now</Text>
             </Pressable>
