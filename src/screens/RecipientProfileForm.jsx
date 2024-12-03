@@ -12,13 +12,42 @@ const RecipientProfileForm = () => {
 
   const genderOptions = ['Male', 'Female', 'Other'];
   const maritalStatusOptions = ['Single', 'Married', 'Divorced', 'Widowed'];
+  const occupationStatusOptions = ['Student', 'Employeed', 'Unemployeed'];
+  const educationalStatusOptions = ['School', 'College', 'University'];
   const clothingSizes = ['S', 'M', 'L', 'XL', 'XXL'];
   const shirtSizes = ['36', '38', '40', '42', '44', '46', '48'];
   const trouserSizes = ['28', '30', '32', '34', '36', '38', '40', '42'];
 
-  const onSubmit = (values) => {
+  const validate = (values) => {
+    const errors = {};
+    if (!values.name) errors.name = 'Name is required';
+    if (!values.age) errors.age = 'Age is required';
+    if (isNaN(values.age)) errors.age = 'Age must be a number';
+    if (!values.gender) errors.gender = 'Gender is required';
+    if (!values.maritalStatus) errors.maritalStatus = 'Marital status is required';
+    if (!values.occupation || values.occupation === 'notsel') {
+      errors.occupation = 'Occupation is required';
+    }
+    if (!values.income) errors.income = 'Income is required';
+    if (isNaN(values.income)) errors.income = 'Income must be a number';
+    if (!values.address) errors.address = 'Address is required';
+    if (!image) errors.image = 'Profile picture is required';
+
+    if (!values.educationLevel) errors.educationLevel = 'Education level is required';
+    if (!values.institution) errors.institution = 'Institution is required';
+    if (!values.class) errors.class = 'Class/Year is required';
+    if (!values.shoeSize) errors.shoeSize = 'Shoe size is required';
+    if (!values.clothingSize) errors.clothingSize = 'Clothing size is required';
+    if (!values.shirtSize) errors.shirtSize = 'Shirt size is required';
+    if (!values.trouserSize) errors.trouserSize = 'Trouser size is required';
+
+    return errors;
+  };
+
+  const onSubmit = (values, { setSubmitting }) => {
     console.log(values);
     // Handle form submission
+    setSubmitting(false);
   };
 
   return (
@@ -45,9 +74,10 @@ const RecipientProfileForm = () => {
             trouserSize: '',
             address: '',
           }}
+          validate={validate}
           onSubmit={onSubmit}
         >
-          {({ handleChange, handleBlur, handleSubmit, values, setFieldValue }) => (
+          {({ handleChange, handleBlur, handleSubmit, values, errors, touched, setFieldValue }) => (
             <>
               {/* Name Input */}
               <View style={styles.inputContainer}>
@@ -60,6 +90,7 @@ const RecipientProfileForm = () => {
                   placeholder="Enter your full name"
                   placeholderTextColor={theme.colors.ivory}
                 />
+                {errors.name && touched.name && <Text style={styles.errorText}>{errors.name}</Text>}
               </View>
 
               {/* Age Input */}
@@ -74,6 +105,7 @@ const RecipientProfileForm = () => {
                   placeholderTextColor={theme.colors.ivory}
                   keyboardType="numeric"
                 />
+                {errors.age && touched.age && <Text style={styles.errorText}>{errors.age}</Text>}
               </View>
 
               {/* Gender Selection */}
@@ -96,9 +128,11 @@ const RecipientProfileForm = () => {
                     </TouchableOpacity>
                   ))}
                 </View>
+                {errors.gender && touched.gender && <Text style={styles.errorText}>{errors.gender}</Text>}
               </View>
-               {/* Address Input */}
-               <View style={styles.inputContainer}>
+
+              {/* Address Input */}
+              <View style={styles.inputContainer}>
                 <Text style={styles.label}>Address</Text>
                 <TextInput
                   style={styles.textArea}
@@ -110,6 +144,7 @@ const RecipientProfileForm = () => {
                   multiline
                   numberOfLines={3}
                 />
+                {errors.address && touched.address && <Text style={styles.errorText}>{errors.address}</Text>}
               </View>
 
               {/* Marital Status Selection */}
@@ -127,6 +162,7 @@ const RecipientProfileForm = () => {
                     ))}
                   </Picker>
                 </View>
+                {errors.maritalStatus && touched.maritalStatus && <Text style={styles.errorText}>{errors.maritalStatus}</Text>}
               </View>
 
               {/* Children Input (Conditional) */}
@@ -145,7 +181,9 @@ const RecipientProfileForm = () => {
                 </View>
               )}
 
-              {/* Occupation Selection */}
+
+
+              {/* occupation Status Selection */}
               <View style={styles.inputContainer}>
                 <Text style={styles.label}>Occupation</Text>
                 <View style={styles.pickerContainer}>
@@ -154,13 +192,15 @@ const RecipientProfileForm = () => {
                     onValueChange={(itemValue) => setFieldValue('occupation', itemValue)}
                     style={styles.picker}
                   >
-                    <Picker.Item label="Select occupation" value="" />
-                    <Picker.Item label="Employed" value="Employed" />
-                    <Picker.Item label="Unemployed" value="Unemployed" />
-                    <Picker.Item label="Student" value="Student" />
+                    <Picker.Item label="Select Occupation status" value="" />
+                    {occupationStatusOptions.map((status) => (
+                      <Picker.Item key={status} label={status} value={status} />
+                    ))}
                   </Picker>
                 </View>
+                {errors.occupation && touched.occupation && <Text style={styles.errorText}>{errors.occupation}</Text>}
               </View>
+
 
               {/* Income Input */}
               <View style={styles.inputContainer}>
@@ -174,25 +214,31 @@ const RecipientProfileForm = () => {
                   placeholderTextColor={theme.colors.ivory}
                   keyboardType="numeric"
                 />
+                {errors.income && touched.income && <Text style={styles.errorText}>{errors.income}</Text>}
               </View>
+
 
               {/* Student-specific fields (Conditional) */}
               {values.occupation === 'Student' && (
                 <>
+
+                  {/* Educational level Status Selection */}
                   <View style={styles.inputContainer}>
-                    <Text style={styles.label}>Education Level</Text>
+                    <Text style={styles.label}>Educationl Level</Text>
                     <View style={styles.pickerContainer}>
                       <Picker
-                        selectedValue={values.educationLevel}
+                        selectedValue={values.}
                         onValueChange={(itemValue) => setFieldValue('educationLevel', itemValue)}
                         style={styles.picker}
                       >
-                        <Picker.Item label="Select education level" value="" />
-                        <Picker.Item label="School" value="School" />
-                        <Picker.Item label="College" value="College" />
-                        <Picker.Item label="University" value="University" />
+                        <Picker.Item label="Select Educational Level" value="" />
+                        {educationalStatusOptions.map((status) => (
+                          <Picker.Item key={status} label={status} value={status} />
+                        ))}
                       </Picker>
                     </View>
+                    {errors.educationLevel && touched.educationLevel && <Text style={styles.errorText}>{errors.educationLevel}</Text>}
+                    
                   </View>
 
                   <View style={styles.inputContainer}>
@@ -205,6 +251,7 @@ const RecipientProfileForm = () => {
                       placeholder="Enter institution name"
                       placeholderTextColor={theme.colors.ivory}
                     />
+                    {errors.institution && touched.institution && <Text style={styles.errorText}>{errors.institution}</Text>}
                   </View>
 
                   {values.educationLevel === 'School' && (
@@ -218,6 +265,7 @@ const RecipientProfileForm = () => {
                         placeholder="Enter your class or standard"
                         placeholderTextColor={theme.colors.ivory}
                       />
+                       {errors.class && touched.class && <Text style={styles.errorText}>{errors.class}</Text>}
                     </View>
                   )}
 
@@ -232,10 +280,12 @@ const RecipientProfileForm = () => {
                         placeholder="Enter your year of study"
                         placeholderTextColor={theme.colors.ivory}
                       />
+                      {errors.class && touched.class && <Text style={styles.errorText}>{errors.class}</Text>}
                     </View>
                   )}
                 </>
               )}
+
 
               {/* Shoe Size Input */}
               <View style={styles.inputContainer}>
@@ -248,6 +298,7 @@ const RecipientProfileForm = () => {
                   placeholder="Enter your shoe size"
                   placeholderTextColor={theme.colors.ivory}
                 />
+                {errors.shoeSize && touched.shoeSize && <Text style={styles.errorText}>{errors.shoeSize}</Text>}
               </View>
 
               {/* Clothing Size Selection */}
@@ -265,6 +316,7 @@ const RecipientProfileForm = () => {
                     ))}
                   </Picker>
                 </View>
+                {errors.clothingSize && touched.clothingSize && <Text style={styles.errorText}>{errors.clothingSize}</Text>}
               </View>
 
               {/* Shirt Size Selection */}
@@ -282,6 +334,7 @@ const RecipientProfileForm = () => {
                     ))}
                   </Picker>
                 </View>
+                {errors.shirtSize && touched.shirtSize && <Text style={styles.errorText}>{errors.shirtSize}</Text>}
               </View>
 
               {/* Trouser Size Selection */}
@@ -299,6 +352,7 @@ const RecipientProfileForm = () => {
                     ))}
                   </Picker>
                 </View>
+                {errors.trouserSize && touched.trouserSize && <Text style={styles.errorText}>{errors.trouserSize}</Text>}
               </View>
 
               {/* Profile Picture Upload */}
@@ -309,6 +363,7 @@ const RecipientProfileForm = () => {
                   selectedImages={image ? [image] : []}
                   onImagesChange={(images) => setImage(images[0])}
                 />
+                {errors.image && <Text style={styles.errorText}>{errors.image}</Text>}
               </View>
 
               {/* Submit Button */}
@@ -329,18 +384,6 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
     paddingTop: 40,
-  },
-  textArea: {
-    backgroundColor: theme.colors.TaupeBlack,
-    height: 80,
-    borderWidth: 1,
-    borderRadius: 10,
-    borderColor: theme.colors.ivory,
-    paddingHorizontal: 15,
-    paddingTop: 10,
-    color: theme.colors.ivory,
-    fontSize: 16,
-    textAlignVertical: 'top',
   },
   title: {
     fontSize: 24,
@@ -372,6 +415,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     color: theme.colors.ivory,
     fontSize: 16,
+  },
+  textArea: {
+    backgroundColor: theme.colors.TaupeBlack,
+    height: 80,
+    borderWidth: 1,
+    borderRadius: 10,
+    borderColor: theme.colors.ivory,
+    paddingHorizontal: 15,
+    paddingTop: 10,
+    color: theme.colors.ivory,
+    fontSize: 16,
+    textAlignVertical: 'top',
   },
   radioContainer: {
     flexDirection: 'row',
@@ -413,12 +468,17 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 10,
     alignItems: 'center',
-    marginTop: 20, 
+    marginTop: 20,
   },
   submitButtonText: {
     color: theme.colors.ivory,
     fontWeight: 'bold',
     fontSize: 18,
+  },
+  errorText: {
+    color: 'red',
+    fontSize: 12,
+    marginTop: 5,
   },
 });
 
