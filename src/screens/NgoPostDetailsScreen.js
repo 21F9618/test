@@ -1,20 +1,29 @@
-import React from 'react';
-import { SafeAreaView, StyleSheet, Text, Image, TouchableOpacity, ScrollView, View } from 'react-native';
+import React, { useState } from 'react';
+import { SafeAreaView, StyleSheet, Text, Image, TouchableOpacity, ScrollView, View, Animated } from 'react-native';
 import { theme } from '../core/theme';
 import BackButton from "../components/BackButton";
 import Button from "../components/Button";
 
-
 export default function NgoPostDetailsScreen({ route, navigation }) {
   const { title, description, image } = route.params;
+  const [showButton, setShowButton] = useState(true);
 
+  const handleScroll = (event) => {
+    const scrollY = event.nativeEvent.contentOffset.y;
+    setShowButton(scrollY <= 50); // Hide the button if scrolled more than 50 pixels
+  };
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.backButtonWrapper}>
-        <BackButton goBack={navigation.goBack} />
-      </View>
-      <ScrollView>
+      {showButton && (
+        <View style={styles.backButtonWrapper}>
+          <BackButton goBack={navigation.goBack} />
+        </View>
+      )}
+      <ScrollView
+        onScroll={handleScroll}
+        scrollEventThrottle={16} // Improves scroll performance
+      >
         <Image source={image} style={styles.detailsImage} />
         <Text style={styles.detailsTitle}>{title}</Text>
         <Text style={styles.detailsDescription}>{description}</Text>
@@ -29,7 +38,6 @@ export default function NgoPostDetailsScreen({ route, navigation }) {
             Donate Now
           </Button>
         </View>
-
       </ScrollView>
     </SafeAreaView>
   );
@@ -39,7 +47,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: theme.colors.TaupeBlack,
-    padding: 10,
+    padding: 20,
   },
   detailsImage: {
     height: 300,
@@ -62,13 +70,14 @@ const styles = StyleSheet.create({
   },
   backButtonWrapper: {
     position: 'absolute',
-    top: 5,
-    left: 0,
+    marginTop:-10,
+    left: 2,
+    zIndex: 100,
   },
   buttonContainer: {
-    marginTop: 10, // Add some space from the content above
-    alignItems: 'center', // Horizontally center the button
-    paddingBottom: 20,  // Padding at the bottom
+    marginTop: 10,
+    alignItems: 'center',
+    paddingBottom: 20,
   },
   poeticLine: {
     fontSize: 20,

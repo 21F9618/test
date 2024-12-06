@@ -2,17 +2,18 @@ import React from 'react';
 import { SafeAreaView, StyleSheet, Text, Image, TouchableOpacity, ScrollView, View } from 'react-native';
 import { Card } from 'react-native-paper';
 import { theme } from "../core/theme";
-const ngoPostsData = [
+import BackButton from "../components/BackButton";
+export const ngoPostsData = [
     {
         id: 1,
-        source: require('../../assets/items/W_ Eugene Smith’s Landmark Photo Essay, ‘Nurse Midwife’.jpg'),
+        source: require('../../assets/items/food123.jpg'),
         title: 'Food Drive',
         description: 'Our recent food drive fed over 500 people in need.',
         fullDescription: 'Join the Fight Against Hunger in Kenya: A Community Food Drive Kenya is currently grappling with severe drought conditions, leaving countless families facing hunger and malnutrition. Crops have failed, livestock is dying, and water sources are drying up, causing widespread food insecurity. In these trying times, our community has the power to make a difference.An NGO in the region has launched a Food Drive Initiative aimed at providing immediate relief to those hardest hit by the drought. The program focuses on distributing essential food supplies, clean drinking water, and nutritional supplements to vulnerable communities, including children and the elderly. Beyond emergency aid, the NGO is working towards long-term solutions, such as drought-resistant farming programs and community water projects.  How You Can Help: Donate: Every contribution, big or small, helps buy food, water, and medical supplies for those in need Volunteer: Join our efforts to pack and distribute food or help spread awareness about the initiative.Raise Awareness: Share information about the drought and this food drive with your network to amplify the cause.Together, we can bring hope and relief to communities in Kenya facing these harsh conditions. Your support can turn hunger into hope and make a lasting impact. Let’s act now and be the change they desperately need.',
     },
     {
         id: 2,
-        source: require('../../assets/items/Jarring Juxtapositions of Prosperity and Conflict by Uğur Gallenkuş.png'),
+        source: require('../../assets/items/Unknown.jpg'),
         title: 'Education for All Campaign',
         description: 'Aims to provide essential educational materials and support to children in underserved communities.',
         fullDescription:
@@ -61,6 +62,9 @@ const ngoPostsData = [
 export default function ViewNgoPostsScreen({ navigation }) {
     return (
         <SafeAreaView style={styles.container}>
+            <View style={styles.backButtonWrapper}>
+                <BackButton goBack={navigation.goBack} />
+            </View>
             <ScrollView>
                 {ngoPostsData.map((post) => (
                     <View key={post.id} style={styles.cardContainer}>
@@ -91,6 +95,7 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: theme.colors.TaupeBlack,
         padding: 30,
+
     },
     cardContainer: {
         marginBottom: 16,
@@ -123,4 +128,12 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         padding: 10,
     },
+    backButtonWrapper: {
+        position: 'absolute',
+        top: 0, 
+        left: 6, 
+        padding: 10, 
+        zIndex: 100,
+      },
 });
+

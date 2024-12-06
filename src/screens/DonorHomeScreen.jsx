@@ -5,6 +5,7 @@ import { View, Text, Button, TouchableOpacity, StyleSheet, ScrollView, Image, Pr
 import { theme } from "../core/theme";
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import { ngoPostsData } from './ViewNgoPostsScreen';
 
 
 const DonorHomeScreen = ({ navigation }) => {
@@ -15,13 +16,14 @@ const DonorHomeScreen = ({ navigation }) => {
     <View style={[Styles.container, { marginBottom: tabBarHeight }]}>
       <ScrollView>
         <View style={Styles.banner}>
-        <Image source={require('../../assets/items/don1.jpg') } style={{opacity:0.3, width:'100%', height:'100%',              position: 'relative'
-        }} >
+          <Image source={require('../../assets/items/d123.jpg')} style={{
+            opacity: 0.3, width: '100%', height: '100%', position: 'relative'
+          }} >
 
-        </Image>
-<Text style={Styles.heroText}>
-              Hi Donor
-            </Text>
+          </Image>
+          <Text style={Styles.heroText}>
+            Hi Donor
+          </Text>
           <View style={{
             flexDirection: "row",
             alignItems: "center",
@@ -33,41 +35,41 @@ const DonorHomeScreen = ({ navigation }) => {
         </View>
 
         <View style={{ color: theme.colors.ivory }}>
-        <Text style={[Styles.headings, {marginTop:0}]}>Donations</Text>
+          <Text style={[Styles.headings, { marginTop: 0 }]}>Donations</Text>
 
-        <View style={Styles.iconContainer}>
-                 
-                        <TouchableOpacity onPress={() => navigation.navigate('Education')}>
-                            <Icon
-                                name="school"
-                                size={40}
-                                color={theme.colors.sageGreen}
-                                style={Styles.icon}
-                            />
-                        </TouchableOpacity>
-                        <TouchableOpacity onPress={() => navigation.navigate('Clothes')}>
-                            <Icon
-                                name="checkroom"
-                                size={40}
-                                color={ theme.colors.sageGreen} // Highlight if on Clothing page
-                                style={Styles.icon} // Apply active style if on Clothing page
-                            />
-                        </TouchableOpacity>
-                        <TouchableOpacity onPress={() => navigation.navigate('Food')}>
-                            <Icon
-                                name="local-dining"
-                                size={40}
-                                color={theme.colors.sageGreen}
-                                style={Styles.icon}
-                            />
-                        </TouchableOpacity>
-                        
-                    </View>
+          <View style={Styles.iconContainer}>
+
+            <TouchableOpacity onPress={() => navigation.navigate('Education')}>
+              <Icon
+                name="school"
+                size={40}
+                color={theme.colors.sageGreen}
+                style={Styles.icon}
+              />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => navigation.navigate('Clothes')}>
+              <Icon
+                name="checkroom"
+                size={40}
+                color={theme.colors.sageGreen}
+                style={Styles.icon} 
+              />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => navigation.navigate('Food')}>
+              <Icon
+                name="local-dining"
+                size={40}
+                color={theme.colors.sageGreen}
+                style={Styles.icon}
+              />
+            </TouchableOpacity>
+
+          </View>
         </View>
 
         <View style={Styles.hero}>
           <View>
-            <Image source={require('../../assets/items/don1.jpg')} style={{
+            <Image source={require('../../assets/items/Charity (Sadaqah).jpg')} style={{
               height: '100%',
               width: '100%',
               borderRadius: 20,
@@ -89,12 +91,12 @@ const DonorHomeScreen = ({ navigation }) => {
           </View>
         </View>
 
-        <Text style={[Styles.headings, {marginTop:20}]}>Features</Text>
+        <Text style={[Styles.headings, { marginTop: 20 }]}>Features</Text>
 
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
-          
+
         >
           <TouchableOpacity
             onPress={() => navigation.navigate("ScheduleDelivery")}
@@ -123,55 +125,39 @@ const DonorHomeScreen = ({ navigation }) => {
           >
           </TouchableOpacity>
         </ScrollView>
-        <Text style={[Styles.headings, {marginTop:20}]}>Campaigns</Text>
-
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginHorizontal: 10, marginTop: 10 }}>
+          <Text style={[Styles.headings, { marginTop: 0 }]}>Campaigns</Text>
+          <TouchableOpacity onPress={() => navigation.navigate("ViewNgoPostsScreen")}>
+            <Text style={[Styles.viewAllButton, { marginTop: 0 }]}>View All</Text>
+          </TouchableOpacity>
+        </View>
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
-          
         >
-          <TouchableOpacity
-            onPress={() => navigation.navigate("ScheduleDelivery")}
-            style={Styles.CampCards}
-          >
-            <Image source={require('../../assets/items/ngo1.jpg')} style={{
-              width: '100%',
-              opacity: 0.8,
-              height: '80%',
-              borderColor: 'black',
-              borderTopLeftRadius: 20,
-              borderTopRightRadius: 20,
-            }} />
-            <Text style={{ color: theme.colors.ivory }}>Delivery</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            onPress={() => navigation.navigate("ViewNgoPostsScreen")}
-            style={Styles.CampCards}
-          >
-          <Image source={require('../../assets/items/ngo3.jpg')} style={{
-              width: '100%',
-              opacity: 0.8,
-              height: '80%',
-              borderColor: 'black',
-              borderTopLeftRadius: 20,
-              borderTopRightRadius: 20,
-            }} />
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            onPress={() => navigation.navigate("Detail")}
-            style={Styles.CampCards}
-          >
-            <Image source={require('../../assets/items/ngo2.jpg')} style={{
-              width: '100%',
-              opacity: 0.8,
-              height: '80%',
-              borderColor: 'black',
-              borderTopLeftRadius: 20,
-              borderTopRightRadius: 20,
-            }} />
-          </TouchableOpacity>
+          {ngoPostsData.slice(0, 3).map((post) => (
+            <TouchableOpacity
+              key={post.id}
+              onPress={() => navigation.navigate('NgoPostDetailsScreen', {
+                title: post.title,
+                description: post.fullDescription,
+                image: post.source,
+              })}
+              style={Styles.CampCards}
+            >
+              <Image source={post.source} style={{
+                width: '100%',
+                opacity: 0.8,
+                height: '80%',
+                borderColor: 'black',
+                borderTopLeftRadius: 20,
+                borderTopRightRadius: 20,
+              }} />
+              <View style={Styles.campaignContent}>
+                <Text style={Styles.campaignTitle} numberOfLines={1}>{post.title}</Text>
+              </View>
+            </TouchableOpacity>
+          ))}
         </ScrollView>
       </ScrollView>
     </View>
@@ -245,27 +231,48 @@ const Styles = StyleSheet.create({
     borderWidth: 3,
     alignItems: 'center',
   },
-  headings:{ color: theme.colors.ivory, fontSize: 23, paddingTop:20, fontWeight:"bold", marginLeft:10 },
-  categories:{
+  headings: { color: theme.colors.ivory, fontSize: 23, paddingTop: 20, fontWeight: "bold", marginLeft: 10 },
+  categories: {
     width: 70,
     height: 70,
     borderRadius: 35, // Half of width/height for perfect circle
     marginBottom: 8,
     position: 'relative',
-    backgroundColor:theme.colors.sageGreen
+    backgroundColor: theme.colors.sageGreen
   },
   iconContainer: {
     flexDirection: 'row',
     justifyContent: 'center', // Center icons with minimal spacing
     backgroundColor: theme.colors.charcoalBlack,
-},
-icon: {
+  },
+  viewAllButton: {
+    color: theme.colors.ivory,
+    fontSize: 16,
+    paddingTop: 20,
+    marginLeft: 10,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    borderRadius: 10,
+  },
+  icon: {
     backgroundColor: theme.colors.outerSpace,
     padding: 10,
     borderRadius: 25,
     marginHorizontal: 5,
-    marginTop:5
-},
+    marginTop: 5
+  },
+  campaignContent: {
+    padding: 10,
+  },
+  campaignTitle: {
+    color: theme.colors.ivory,
+    fontSize: 16,
+    alignSelf: "center",
+  },
+  campaignDescription: {
+    color: theme.colors.ivory,
+    fontSize: 14,
+    marginTop: 5,
+  },
 });
 
 export default DonorHomeScreen;
