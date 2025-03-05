@@ -8,6 +8,7 @@ import Ionicons from "react-native-vector-icons/Ionicons";
 // import NewOrderPopup from "../../components/NewOrderPopup";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import NewOrderPopup from "../components/NewOrderPopup";
+import * as Location from 'expo-location';
 
 
 const GOOGLE_API_KEY = "AIzaSyB9irjntPHdEJf024h7H_XKpS11OeW1Nh8";
@@ -49,8 +50,20 @@ const RiderFinalHomeScreen = ({ navigation }) => {
     };
 
     const onUserLocationChange = (event) => {
-        console.log("User location changed:", event.nativeEvent.coordinate);
-        setMyPosition(event.nativeEvent.coordinate);
+        const newLocation = event.nativeEvent.coordinate;
+        console.log("📍 New Position Update:", newLocation);
+    
+        if (newLocation && newLocation.latitude && newLocation.longitude) {
+            setMyPosition(newLocation);
+            console.log("✅ Position updated in state:", newLocation);
+        } else {
+            console.log("⚠️ Position update failed!");
+        }
+    };
+    
+
+    const onDirectionFound= (event) => {
+        console.log("user directions", event);
     };
 
     const renderBottomTitle = () => {
@@ -76,21 +89,22 @@ const RiderFinalHomeScreen = ({ navigation }) => {
     return (
         <View>
             <MapView
-                ref={mapRef}
-                style={{ width: '100%', height: Dimensions.get('window').height - 120 }}
-                provider={PROVIDER_GOOGLE}
-                showsUserLocation={true}
-                onUserLocationChange={onUserLocationChange}
-                initialRegion={{
-                    latitude: 36.0,
-                    longitude: -120.0,
-                    latitudeDelta: 5.0,
-                    longitudeDelta: 5.0,
-                }}
+                 ref={mapRef}
+                 style={{ width: '100%', height: Dimensions.get('window').height - 120 }}
+                 provider={PROVIDER_GOOGLE}
+                 showsUserLocation={true}  // ✅ Enables user location (blue dot)
+                 followsUserLocation={true} // ✅ (Optional) Keeps the camera centered
+                 onUserLocationChange={onUserLocationChange} // ✅ Handles user movement
+                 initialRegion={{
+                     latitude: myPosition?.latitude || 36.0,  // ✅ Use `myPosition` if available
+                     longitude: myPosition?.longitude || -120.0,
+                     latitudeDelta: 5.0,
+                     longitudeDelta: 5.0,
+                 }}
             >
                 {order && (
                     <MapViewDirections
-                        origin={order.origin}
+                        origin={myPosition}
                         destination={order.destination}
                         apikey={GOOGLE_API_KEY}
                         strokeWidth={5}
@@ -107,6 +121,43 @@ const RiderFinalHomeScreen = ({ navigation }) => {
                     />
                 )}
             </MapView>
+            <Pressable
+                onPress={() => console.warn('Balance')}
+                style={styles.balanceButton}>
+                <Text style={styles.balanceText}>
+                    <Text style={{ color: 'green' }}>$</Text>
+                    {' '}
+                    0.00
+                </Text>
+            </Pressable>
+            <Pressable
+                onPress={() => console.warn('Hey')}
+                style={[styles.roundButton, { top: 10, left: 10 }]} // ✅ Correct syntax
+            >
+                <Entypo name={"menu"} size={24} color={"black"} />
+            </Pressable>
+
+            <Pressable
+                onPress={() => console.warn('Hey')}
+                style={[styles.roundButton, { top: 10, right: 10 }]} // ✅ Correct syntax
+            >
+                <Entypo name={"menu"} size={24} color={"black"} />
+            </Pressable>
+
+            <Pressable
+                onPress={() => console.warn('Hey')}
+                style={[styles.roundButton, { bottom: 110, left: 10 }]} // ✅ Correct syntax
+            >
+                <Entypo name={"menu"} size={24} color={"black"} />
+            </Pressable>
+
+            <Pressable
+                onPress={() => console.warn('Hey')}
+                style={[styles.roundButton, { bottom: 110, right: 10 }]} // ✅ Correct syntax
+            >
+                <Entypo name={"menu"} size={24} color={"black"} />
+            </Pressable>
+
 
             <Pressable onPress={onGopress} style={[styles.goButton, { bottom: 110, right: 10 }]}>
                 <Text style={styles.goText}>{isOnline ? 'END' : 'GO'}</Text>
@@ -130,6 +181,7 @@ const RiderFinalHomeScreen = ({ navigation }) => {
         </View>
     );
 };
+
 
 
 
@@ -193,6 +245,69 @@ const styles = StyleSheet.create({
 });
 
 export default RiderFinalHomeScreen;
+
+////////////////////////////////////////////
+
+// import { useState, useEffect, useRef } from "react";
+// import { View, Dimensions, Alert } from "react-native";
+// import MapView, { PROVIDER_GOOGLE } from "react-native-maps";
+// import * as Location from 'expo-location';  // ✅ Import Expo Location
+
+// const RiderFinalHomeScreen = () => {
+//     const [myPosition, setMyPosition] = useState(null);
+//     const mapRef = useRef(null);
+
+//     useEffect(() => {
+//         (async () => {
+//             let { status } = await Location.requestForegroundPermissionsAsync();
+//             if (status !== 'granted') {
+//                 Alert.alert("Permission Denied", "Enable location services to use this feature.");
+//                 return;
+//             }
+
+//             let location = await Location.getCurrentPositionAsync({});
+//             setMyPosition({
+//                 latitude: location.coords.latitude,
+//                 longitude: location.coords.longitude,
+//             });
+//             console.log("📍 Initial Position:", location.coords); // ✅ Debug log
+//         })();
+//     }, []);
+
+//     const onUserLocationChange = (event) => {
+//         const newLocation = event.nativeEvent.coordinate;
+//         console.log("📍 New Position Update:", newLocation);
+
+//         if (newLocation && newLocation.latitude && newLocation.longitude) {
+//             setMyPosition(newLocation);
+//             console.log("✅ Position updated in state:", newLocation);
+//         } else {
+//             console.log("⚠️ Position update failed!");
+//         }
+//     };
+
+//     return (
+//         <View style={{ flex: 1 }}>
+//             <MapView
+//                 ref={mapRef}
+//                 style={{ width: '100%', height: Dimensions.get('window').height - 120 }}
+//                 provider={PROVIDER_GOOGLE}
+//                 showsUserLocation={true}  // ✅ Displays blue dot
+//                 followsUserLocation={true} // ✅ Keeps camera centered on user
+//                 onUserLocationChange={onUserLocationChange} // ✅ Handles movement updates
+//                 initialRegion={{
+//                     latitude: myPosition?.latitude || 36.0,  // ✅ Uses state if available
+//                     longitude: myPosition?.longitude || -120.0,
+//                     latitudeDelta: 5.0,
+//                     longitudeDelta: 5.0,
+//                 }}
+//             />
+//         </View>
+//     );
+// };
+
+// export default RiderFinalHomeScreen;
+
 
 
 
