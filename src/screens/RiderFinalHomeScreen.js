@@ -17,7 +17,11 @@ const destination = { latitude: 37.771707, longitude: -122.4053769 };
 
 const RiderFinalHomeScreen = ({ navigation }) => {
     const [myPosition, setMyPosition] = useState(null);
+    const [routeInfo, setRouteInfo] = useState({ distance: 0, duration: 0 });
+    const [distance, setDistance] = useState(null);
+const [duration, setDuration] = useState(null);
     const [order, setOrder] = useState(null);
+    
     const [newOrder, setNewOrder] = useState({
         id: '1',
         type: 'Clothes',
@@ -51,14 +55,36 @@ const RiderFinalHomeScreen = ({ navigation }) => {
 
     const onUserLocationChange = (event) => {
         const newLocation = event.nativeEvent.coordinate;
-        console.log("📍 New Position Update:", newLocation);
+    console.log("📍 Updated Position:", newLocation);
+
+    if (!order) return; // No order, no tracking needed
+
+    setMyPosition(newLocation);
+
+    // Compute remaining distance
+    const distanceLeft = haversineDistance(newLocation, order.destination);
+    const durationLeft = (distanceLeft / routeInfo.distance) * routeInfo.duration; 
+
+    console.log(`🚴 ${distanceLeft.toFixed(2)} km left, approx. ${durationLeft.toFixed(2)} min`);
+
+    if (distanceLeft < 0.01) { 
+        console.log("🎉 You have reached your destination!");
+    }
+    };
+
+    const haversineDistance = (coord1, coord2) => {
+        const R = 6371; // Radius of the Earth in km
+        const dLat = (coord2.latitude - coord1.latitude) * (Math.PI / 180);
+        const dLon = (coord2.longitude - coord1.longitude) * (Math.PI / 180);
+        const lat1 = coord1.latitude * (Math.PI / 180);
+        const lat2 = coord2.latitude * (Math.PI / 180);
     
-        if (newLocation && newLocation.latitude && newLocation.longitude) {
-            setMyPosition(newLocation);
-            console.log("✅ Position updated in state:", newLocation);
-        } else {
-            console.log("⚠️ Position update failed!");
-        }
+        const a = 
+            Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.sin(dLon / 2) * Math.sin(dLon / 2) * Math.cos(lat1) * Math.cos(lat2);
+        
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return R * c; // Distance in km
     };
     
 
@@ -71,11 +97,15 @@ const RiderFinalHomeScreen = ({ navigation }) => {
             return (
                 <View style={{ alignItems: 'center' }}>
                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                        <Text>1 min </Text>
-                        <View style={{ backgroundColor: '#48d42a', width: 34, height: 34, alignItems: 'center', justifyContent: 'center', borderRadius: 20, marginHorizontal: 10 }}>
+                        <Text>{duration ? `${Math.round(duration)} min` : "Calculating..."}</Text>
+                        <View style={{
+                            backgroundColor: '#48d42a', width: 34, height: 34,
+                            alignItems: 'center', justifyContent: 'center',
+                            borderRadius: 20, marginHorizontal: 10
+                        }}>
                             <FontAwesome name={"user"} color={"white"} size={20} />
                         </View>
-                        <Text> 0.2</Text>
+                        <Text>{distance ? `${distance.toFixed(1)} km` : "..."}</Text>
                     </View>
                     <Text style={styles.bottomTextuser}>
                         Picking up donation from {"\n"}{order.user.name}
@@ -103,22 +133,27 @@ const RiderFinalHomeScreen = ({ navigation }) => {
                  }}
             >
                 {order && (
-                    <MapViewDirections
-                        origin={myPosition}
-                        destination={order.destination}
-                        apikey={GOOGLE_API_KEY}
-                        strokeWidth={5}
-                        strokeColor="red"
-                        onReady={(result) => {
-                            console.log("Polyline coordinates:", result.coordinates);
-                            if (mapRef.current) {
-                                mapRef.current.fitToCoordinates(result.coordinates, {
-                                    edgePadding: { top: 50, right: 50, bottom: 50, left: 50 },
-                                    animated: true,
-                                });
-                            }
-                        }}
-                    />
+            //       
+            <MapViewDirections
+        origin={myPosition}
+        destination={order.destination}
+        apikey={GOOGLE_API_KEY}
+        strokeWidth={5}
+        strokeColor="red"
+        onReady={(result) => {
+            console.log("Route found:", result);
+            setDistance(result.distance); // Distance in km
+            setDuration(result.duration); // Duration in minutes
+            
+            if (mapRef.current) {
+                mapRef.current.fitToCoordinates(result.coordinates, {
+                    edgePadding: { top: 50, right: 50, bottom: 50, left: 50 },
+                    animated: true,
+                });
+            }
+        }}
+    />
+               
                 )}
             </MapView>
             <Pressable
