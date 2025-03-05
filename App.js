@@ -17,6 +17,9 @@ import {
   ScheduleDelivery,
   StartScreen,
   WaitForApprovalScreen,
+  RiderHomeScreen,
+  RiderFinalHomeScreen,
+
   
 } from "./src/screens";
 import TabNavigator from './src/navigator/TabNavigator';
@@ -54,6 +57,7 @@ export default function App(){
         component={Dashboard}></Stack.Screen>
 
 <Stack.Screen name="StartScreen" component={StartScreen} />
+<Stack.Screen name="RiderHomeScreen" component={RiderHomeScreen}/>
 
 <Stack.Screen name="RChoose" component={RChoose} />         
 <Stack.Screen name="ChooseRole" component={ChooseRole} />
@@ -64,6 +68,8 @@ export default function App(){
 <Stack.Screen name="ResetPasswordScreen" component={ResetPasswordScreen} /> 
 <Stack.Screen name="WaitForApprovalScreen" component={WaitForApprovalScreen} /> 
 <Stack.Screen name="ScheduleDelivery" component={ScheduleDelivery} /> 
+<Stack.Screen name="RiderFinalHomeScreen" component={RiderFinalHomeScreen}/>
+
             <Stack.Screen name="TabNavigator" component={TabNavigator} />
 
 

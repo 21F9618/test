@@ -21,7 +21,7 @@ export default function StartScreen({ navigation }) {
         <View style={styles.buttonContainer}>
           <Button
             mode="contained"
-            onPress={() => navigation.navigate("ChooseRole")}
+            onPress={() => navigation.navigate("RiderFinalHomeScreen")}
             style={styles.button}
           >
             Get Started
