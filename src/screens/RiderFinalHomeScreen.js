@@ -281,7 +281,7 @@ const styles = StyleSheet.create({
 
 export default RiderFinalHomeScreen;
 
-////////////////////////////////////////////
+//////////////////////////////////////////
 
 // import { useState, useEffect, useRef } from "react";
 // import { View, Dimensions, Alert } from "react-native";
