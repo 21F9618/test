@@ -2,7 +2,7 @@ import { View, Text } from 'react-native'
 import React from 'react'
 import { createStackNavigator } from '@react-navigation/stack'
 import { theme } from '../core/theme'
-import { ChooseCategory, DonorHomeScreen, ScheduleRDeliveryScreen, UploadClothes, UploadEdu, UploadFood, HomeScreenRec, Education, Clothes, Food, ClaimsHistory, ItemDetail, RecepientStartScreen, DonationSuccessScreen, NgoPostDetailsScreen, ViewNgoPostsScreen, NGOCampaignForm } from '../screens';
+import { ChooseCategory, DonorHomeScreen, ScheduleRDeliveryScreen, UploadClothes, UploadEdu, UploadFood, HomeScreenRec, Education, Clothes, Food, ClaimsHistory, ItemDetail, RecepientStartScreen, DonationSuccessScreen, NgoPostDetailsScreen, ViewNgoPostsScreen, NGOCampaignForm, RiderFinalHomeScreen } from '../screens';
 const Stack = createStackNavigator();
 const HomeStackNav = ({ navigation, route }) => {
   const { role } = route.params;
@@ -24,6 +24,15 @@ const HomeStackNav = ({ navigation, route }) => {
           options={{ headerShown: false }}
           initialParams={{ ...route.params }}/>
       )}
+
+{role === "rider" && (
+        <Stack.Screen
+          name="Start"
+          component={RiderFinalHomeScreen}
+          options={{ headerShown: false }}
+          initialParams={{ ...route.params }}/>
+      )}
+
       <Stack.Screen name='ChooseCategory' component={ChooseCategory} options={{ headerShown: false }} />
 
 

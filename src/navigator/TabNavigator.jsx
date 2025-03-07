@@ -35,9 +35,14 @@ function TabNavigator({navigation, route}) {
       <Tab.Screen name="Start-nav" component={HomeStackNav} options={{headerShown:false,  
         tabBarIcon:({color})=> <Entypo name="home" size={24} color={color} />
       } }  initialParams={{ ...route.params }}/>
-      <Tab.Screen name="Notifications" component={Notifications} options={{headerShown:false,
-        tabBarIcon:({color})=> <Ionicons name="notifications" size={24} color={color} />
-      } }/>
+
+
+{(role === "recipient" || role === "donor") && (
+  <Tab.Screen name="Notifications" component={Notifications} options={{
+    headerShown: false,
+    tabBarIcon: ({ color }) => <Ionicons name="notifications" size={24} color={color} />
+  }} />
+)}
 
      
 {role=="recipient" && (

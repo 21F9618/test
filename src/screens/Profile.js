@@ -62,45 +62,58 @@ const Profile = ({ route }) => {
         </Animated.View>
 
         <Text style={styles.username}>{user.name}</Text>
+        {role !== "rider" && (
+  <View style={styles.khairPointsContainer}>
+    <MaterialCommunityIcons name="star" size={24} color={theme.colors.sageGreen} />
+    <Text style={styles.khairPoints}>100 Khair Points</Text>
+  </View>
+)}
 
-        <View style={styles.khairPointsContainer}>
-          <MaterialCommunityIcons name="star" size={24} color={theme.colors.sageGreen} />
-          <Text style={styles.khairPoints}>100 Khair Points</Text>
-        </View>
 
         <View style={styles.infoContainer}>
           <InfoItem icon="phone" text={user.phone} />
           <InfoItem icon="account" text={user.username} />
           {role === "donor" ? (
-          <InfoItem icon="clipboard-check" text="Total Donations: 3" />
-          ):(
-            <InfoItem icon="clipboard-check" text="Total Claims: 3" /> 
-          )}
+    <InfoItem icon="clipboard-check" text="Total Donations: 3" />
+  ) : role === "recipient" ? (
+    <InfoItem icon="clipboard-check" text="Total Claims: 3" />
+  ) : role === "rider" ? (
+    <InfoItem icon="clipboard-check" text="Total Deliveries: 5" />
+  ) : null}
         </View>
       </Animated.View>
 
       <View style={styles.buttonsContainer}>
-      {role === "donor" ? (
-          <AnimatedButton
-            icon="gift"
-            text="My Donations"
-            onPress={() => navigation.navigate("ClaimsHistory")}
-          />
-        ) : (
-          <AnimatedButton
-            icon="history"
-            text="My Claims"
-            onPress={() => navigation.navigate("ClaimsHistory")}
-          />
-        )}
-        <AnimatedButton
-          icon="logout"
-          text="Logout"
-          onPress={handleLogout}
-          style={styles.logoutButton}
-          textStyle={styles.logoutText}
-        />
-      </View>
+  {role === "donor" ? (
+    <AnimatedButton
+      icon="gift"
+      text="My Donations"
+      onPress={() => navigation.navigate("ClaimsHistory")}
+    />
+  ) : role === "recipient" ? (
+    <AnimatedButton
+      icon="history"
+      text="My Claims"
+      onPress={() => navigation.navigate("ClaimsHistory")}
+    />
+  ) : role === "rider" ? (
+    <AnimatedButton
+      icon="truck-delivery"
+      text="My Deliveries"
+      onPress={() => navigation.navigate("ClaimsHistory")}
+    />
+  ) : null}
+
+  <AnimatedButton
+    icon="logout"
+    text="Logout"
+    onPress={handleLogout}
+    style={styles.logoutButton}
+    textStyle={styles.logoutText}
+  />
+</View>
+
+          
     </ScrollView>
   );
 };

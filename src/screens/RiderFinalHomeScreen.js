@@ -10,6 +10,7 @@ import FontAwesome from "react-native-vector-icons/FontAwesome";
 import NewOrderPopup from "../components/NewOrderPopup";
 import * as Location from 'expo-location';
 import { AuthContext } from "../context/AuthContext";
+import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 
 
 const GOOGLE_API_KEY = "AIzaSyB9irjntPHdEJf024h7H_XKpS11OeW1Nh8";
@@ -17,6 +18,9 @@ const origin = { latitude: 37.3318456, longitude: -122.0296002 };
 const destination = { latitude: 37.771707, longitude: -122.4053769 };
 
 const RiderFinalHomeScreen = ({ navigation,route }) => {
+
+    const tabBarHeight=useBottomTabBarHeight();
+
     const {user} =useContext(AuthContext);
     console.log(user.username);
     const [myPosition, setMyPosition] = useState(null);
@@ -240,7 +244,7 @@ const RiderFinalHomeScreen = ({ navigation,route }) => {
     };
    
     return (
-        <View style={styles.container}>
+        <View style={[styles.container,{marginBottom: tabBarHeight}]}>
             {/* Pickup Banner */}
             {showPickupBanner && (
                 <View style={styles.pickupBanner}>
@@ -354,33 +358,7 @@ const RiderFinalHomeScreen = ({ navigation,route }) => {
                 </Text>
             </Pressable>
             
-            <Pressable
-                onPress={() => console.warn('Hey')}
-                style={[styles.roundButton, { top: 10, left: 10 }]}
-            >
-                <Entypo name={"menu"} size={24} color={"black"} />
-            </Pressable>
 
-            <Pressable
-                onPress={() => console.warn('Hey')}
-                style={[styles.roundButton, { top: 10, right: 10 }]}
-            >
-                <Entypo name={"menu"} size={24} color={"black"} />
-            </Pressable>
-
-            <Pressable
-                onPress={() => console.warn('Hey')}
-                style={[styles.roundButton, { bottom: 110, left: 10 }]}
-            >
-                <Entypo name={"menu"} size={24} color={"black"} />
-            </Pressable>
-
-            <Pressable
-                onPress={() => console.warn('Hey')}
-                style={[styles.roundButton, { bottom: 110, right: 10 }]}
-            >
-                <Entypo name={"menu"} size={24} color={"black"} />
-            </Pressable>
 
             <Pressable onPress={onGopress} style={styles.goButton}>
                 <Text style={styles.goText}>{isOnline ? 'END' : 'GO'}</Text>
@@ -407,12 +385,14 @@ const RiderFinalHomeScreen = ({ navigation,route }) => {
 
 const styles = StyleSheet.create({
     bottomContainer: {
+        bottom: 40,
         height: 100,
         backgroundColor: 'white',
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
         padding: 15,
+        
     },
     bottomText: {
         fontSize: 22,
