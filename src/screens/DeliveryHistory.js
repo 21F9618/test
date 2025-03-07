@@ -1,76 +1,51 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { View, Text, StyleSheet, FlatList, ActivityIndicator } from 'react-native';
 import { theme } from '../core/theme';
 import firestore from '@react-native-firebase/firestore';
-import auth from '@react-native-firebase/auth'; // For getting current user
+import { AuthContext } from "../context/AuthContext";
 
 const DeliveryHistory = () => {
   const [deliveries, setDeliveries] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [currentRiderId, setCurrentRiderId] = useState(null);
+  const { user } = useContext(AuthContext);
 
-  // Get current rider ID
   useEffect(() => {
-    const getCurrentRider = async () => {
-      const currentUser = auth().currentUser;
-      if (currentUser) {
-        // Assuming the user's UID is used as the riderId
-        // If not, you might need to fetch the rider profile from another collection
-        setCurrentRiderId(currentUser.uid);
-        console.log("Current rider ID:", currentUser.uid);
-      } else {
-        setError("User not logged in");
-        setLoading(false);
-      }
-    };
+    if (!user?.username) {
+      setLoading(false); // Stop loading if no username is available
+      return;
+    }
 
-    getCurrentRider();
-  }, []);
+    console.log("Fetching delivery history for rider:", user.username);
 
-  // Fetch deliveries for the current rider
-  useEffect(() => {
-    if (!currentRiderId) return; // Don't fetch if we don't have the rider ID yet
-    
-    console.log("Fetching delivery history for rider:", currentRiderId);
-    
-    // Set up real-time listener for the deliveries_made collection
     const unsubscribe = firestore()
       .collection('deliveries_made')
-      .where('riderId', '==', currentRiderId) // Only get this rider's deliveries
-      .orderBy('timestamp', 'desc') // Assuming you have a timestamp field
-      .onSnapshot(snapshot => {
-        console.log("Deliveries_made collection accessed.");
-        
-        if (snapshot.empty) {
-          console.log("No deliveries found for this rider.");
-          setDeliveries([]);
+      .where('riderId', '==', user.username) // Use user.username directly
+      .onSnapshot(
+        (snapshot) => {
+          if (snapshot.empty) {
+            console.log("No deliveries found for this rider.");
+            setDeliveries([]);
+          } else {
+            console.log(`Found ${snapshot.docs.length} deliveries for this rider.`);
+            setDeliveries(
+              snapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data(),
+              }))
+            );
+          }
           setLoading(false);
-          return;
+        },
+        (error) => {
+          console.error("Error accessing Firestore:", error);
+          setError("Failed to load delivery history");
+          setLoading(false);
         }
-        
-        console.log(`Found ${snapshot.docs.length} deliveries for this rider.`);
-        
-        const deliveryData = snapshot.docs.map(doc => {
-          const data = doc.data();
-          return {
-            id: doc.id,
-            ...data,
-          };
-        });
-        
-        setDeliveries(deliveryData);
-        setLoading(false);
-        console.log("Delivery history updated.");
-      }, error => {
-        console.error("Error accessing Firestore for delivery history:", error);
-        setError("Failed to load delivery history");
-        setLoading(false);
-      });
-    
-    // Cleanup subscription on unmount
+      );
+
     return () => unsubscribe();
-  }, [currentRiderId]);
+  }, [user?.username]); // Depend on `user.username` directly
 
   if (loading) {
     return (
@@ -141,7 +116,7 @@ const DeliveryHistory = () => {
 
 // Helper function to determine status style
 const getStatusStyle = (status) => {
-  switch(status) {
+  switch (status) {
     case 'completed':
       return styles.completedStatus;
     case 'cancelled':

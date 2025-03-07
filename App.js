@@ -20,7 +20,8 @@ import {
   StartScreen,
   WaitForApprovalScreen,
   ChildrenProfiles,
-  RiderFinalHomeScreen
+  RiderFinalHomeScreen,
+  DeliveryHistory
   
 } from "./src/screens";
 import TabNavigator from './src/navigator/TabNavigator';
@@ -75,6 +76,7 @@ export default function App(){
 <Stack.Screen name="RecipientProfileForm" component={RecipientProfileForm}/>
 <Stack.Screen name="ChildrenProfiles" component={ChildrenProfiles}/>
 <Stack.Screen name="RiderFinalHomeScreen" component={RiderFinalHomeScreen}/>
+<Stack.Screen name="DeliveryHistory" component={DeliveryHistory}/>
 
             <Stack.Screen name="TabNavigator" component={TabNavigator} />
 

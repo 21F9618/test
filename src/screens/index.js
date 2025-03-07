@@ -53,6 +53,7 @@ export { default as Food } from './Food';
 export { default as Clothes } from './Clothes';
 export { default as RecepientStartScreen } from './RecepientStartScreen';
 export { default as NgoPostDetailsScreen} from "./NgoPostDetailsScreen";
+export {default as DeliveryHistory} from "./DeliveryHistory";
 
 
 

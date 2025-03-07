@@ -100,7 +100,7 @@ const Profile = ({ route }) => {
     <AnimatedButton
       icon="truck-delivery"
       text="My Deliveries"
-      onPress={() => navigation.navigate("ClaimsHistory")}
+      onPress={() => navigation.navigate("DeliveryHistory")}
     />
   ) : null}
 
