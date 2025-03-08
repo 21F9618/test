@@ -128,7 +128,7 @@ const ItemDetail = ({ route }) => {
         try {
             const BASE_URL = await getBaseUrl();  // If you're using a base URL helper function
 
-            await axios.post(`/api/approve-claims`, { id,category }); // Pass the id in the request body
+            await axios.post(`${BASE_URL}/api/approve-claims`, { id,category }); // Pass the id in the request body
             // setNot(not.filter(item => item.id !== id));
 
             

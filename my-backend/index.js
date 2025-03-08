@@ -83,8 +83,9 @@ const createTables = () => {
         donationType VARCHAR(255) NOT NULL, -- Type of donation (e.g., food, clothes, education)
         itemId INT NOT NULL, -- The ID of the donated item
         claimDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        claimStatus VARCHAR(255) DEFAULT 'Claimed',
-        scheduledelivery VARCHAR(255) DEFAULT 'Unscehduled'
+        scheduledelivery VARCHAR(255) DEFAULT 'Unscehduled',
+        claimStatus VARCHAR(255) DEFAULT 'Claimed'
+        
       );
 
     `;
@@ -159,7 +160,7 @@ const createTables = () => {
 
     // Query to insert a claimed item into the ClaimedItems table
     const query = `
-      INSERT INTO ClaimedItems (donorUsername, claimerUsername, donationType,itemName, itemId, claimStatus,scheduledelivery)
+      INSERT INTO ClaimedItems (donorUsername, claimerUsername, donationType,itemName, itemId, scheduledelivery,claimStatus)
       VALUES (?, ?, ?, ?, ?,?,?)
     `;
 
