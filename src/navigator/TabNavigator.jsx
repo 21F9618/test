@@ -20,7 +20,7 @@ import HomeStackNav from "./HomeStackNav";
 const Tab = createBottomTabNavigator();
 
 function TabNavigator({navigation, route}) {
-  const { role } = route.params;
+  const role = route.params; // Provide a fallback if role is undefined
 
   return (
     <CartProvider>
@@ -35,9 +35,18 @@ function TabNavigator({navigation, route}) {
       <Tab.Screen name="Start-nav" component={HomeStackNav} options={{headerShown:false,  
         tabBarIcon:({color})=> <Entypo name="home" size={24} color={color} />
       } }  initialParams={{ ...route.params }}/>
-      <Tab.Screen name="Notifications" component={Notifications} options={{headerShown:false,
-        tabBarIcon:({color})=> <Ionicons name="notifications" size={24} color={color} />
-      } }/>
+
+      <Tab.Screen name="Notifications" component={Notifications} 
+  options={{headerShown:false,
+    tabBarIcon:({color})=> (
+      <View>
+        <Ionicons name="notifications" size={24} color={color} />
+       
+      </View>
+    )
+  }} initialParams={{ ...route.params }}
+/>
+
 
      
 {role=="recipient" && (

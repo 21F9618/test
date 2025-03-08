@@ -1,10 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react'; // Add useContext here
+import { getBaseUrl } from '../helpers/deviceDetection';
+import axios from 'axios';
+
 import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, Modal, TouchableWithoutFeedback } from 'react-native';
 import { theme } from '../core/theme';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import MaterialIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useCart } from '../CartContext';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
+import { AuthContext } from "../context/AuthContext"; // Import AuthContext
 
 const ItemDetail = ({ route }) => {
     const { item, category, role } = route.params; // Assuming userRole is passed in route params
@@ -12,7 +16,9 @@ const ItemDetail = ({ route }) => {
     const { addToCart, isInCart } = useCart();
     const [isModalVisible, setIsModalVisible] = useState(false);
     const tabBarHeight = useBottomTabBarHeight();
-
+    const { user } = useContext(AuthContext); // Get user from AuthContext
+    const [not, setNot] = useState([]);
+    
     const isClaimed = isInCart(item);
 
     // Normalize userRole to handle case variations
@@ -80,7 +86,36 @@ const ItemDetail = ({ route }) => {
                 );
         }
     };
-
+    const claimItemInDB = async () => {
+        const claimedItemDetails = {
+            donorUsername: item.donorUsername,
+            claimerUsername: user.username, // Replace this with the actual claimer's username (you can get this from user context or route)
+            donationType: category,
+            itemId: item.id,
+            claimStatus:'Claimed',
+             // Assuming each item has a unique ID
+             itemName:item.itemName
+        };
+    
+        try {
+            const response = await fetch('http://10.0.2.2:3000/api/add-claimed-item', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(claimedItemDetails),
+            });
+    
+            if (response.ok) {
+                console.log('Item claimed successfully in the database');
+            } else {
+                console.error('Error claiming item in the database');
+            }
+        } catch (error) {
+            console.error('Error claiming item:', error);
+        }
+    };
+    
     const showConfirmationModal = () => {
         setIsModalVisible(true);
     };
@@ -88,11 +123,27 @@ const ItemDetail = ({ route }) => {
     const hideConfirmationModal = () => {
         setIsModalVisible(false);
     };
+    const changingStatus = async (category,id) => {
+        try {
+            const BASE_URL = await getBaseUrl();  // If you're using a base URL helper function
+
+            await axios.post(`/api/approve-claims`, { id,category }); // Pass the id in the request body
+            // setNot(not.filter(item => item.id !== id));
+
+            
+        } catch (error) {
+            console.error(`Error changing claim status of table ${category}:`, error);
+            
+        }
+    };
 
     const confirmClaimItem = () => {
+         changingStatus(category,item.id);
         addToCart(item); // Add to cart if confirmed
+        claimItemInDB(); // Call the function to store the claimed item in the database
         setIsModalVisible(false);
     };
+    
 
     return (
         <ScrollView style={[styles.container, { marginBottom: tabBarHeight }]}>
