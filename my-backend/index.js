@@ -83,7 +83,8 @@ const createTables = () => {
         donationType VARCHAR(255) NOT NULL, -- Type of donation (e.g., food, clothes, education)
         itemId INT NOT NULL, -- The ID of the donated item
         claimDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        claimStatus VARCHAR(255) DEFAULT 'Claimed'
+        claimStatus VARCHAR(255) DEFAULT 'Claimed',
+        scheduledelivery VARCHAR(255) DEFAULT 'Unscehduled'
       );
 
     `;
@@ -151,23 +152,23 @@ const createTables = () => {
   createTables();
   app.post('/api/add-claimed-item', (req, res) => {
     console.log(req.body);
-    const { donorUsername, claimerUsername, donationType,claimStatus,itemName, itemId } = req.body;
+    const { donorUsername, claimerUsername, donationType,claimStatus,itemName, itemId,scheduledelivery } = req.body;
     // const claimStatus = 'Claimed';
 
-    console.log("Received data:", { donorUsername, claimerUsername, donationType,itemName, itemId, claimStatus });
+    console.log("Received data:", { donorUsername, claimerUsername, donationType,itemName, itemId, claimStatus,scheduledelivery });
 
     // Query to insert a claimed item into the ClaimedItems table
     const query = `
-      INSERT INTO ClaimedItems (donorUsername, claimerUsername, donationType,itemName, itemId, claimStatus)
-      VALUES (?, ?, ?, ?, ?,?)
+      INSERT INTO ClaimedItems (donorUsername, claimerUsername, donationType,itemName, itemId, claimStatus,scheduledelivery)
+      VALUES (?, ?, ?, ?, ?,?,?)
     `;
 
     // Log the data being passed to the query
     console.log('Executing query with:', [donorUsername, claimerUsername, donationType,    itemName ,
-      itemId,claimStatus|| 'Claimed']);
+      itemId,scheduledelivery,claimStatus|| 'Claimed']);
 
     // Execute the query
-    db.query(query, [donorUsername, claimerUsername, donationType,itemName, itemId, claimStatus || 'Claimed'], (err, results) => {
+    db.query(query, [donorUsername, claimerUsername, donationType,itemName, itemId,scheduledelivery, claimStatus || 'Claimed'], (err, results) => {
         if (err) {
             console.error('Error inserting claimed item:', err);
             return res.status(500).send('Error claiming item');

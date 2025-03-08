@@ -93,6 +93,7 @@ const ItemDetail = ({ route }) => {
             donationType: category,
             itemId: item.id,
             claimStatus:'Claimed',
+            scheduledelivery:'Unscheduled',
              // Assuming each item has a unique ID
              itemName:item.itemName
         };

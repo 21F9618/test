@@ -3,7 +3,7 @@ import { getBaseUrl } from './deviceDetection'; // This function returns the bas
 
 export async function addClaimedItem(claimedItemData) {
   // Destructure the claimedItemData object to get the required fields
-  const { itemId, itemName, claimerUsername, donorUsername, donationType, status } = claimedItemData;
+  const { itemId, itemName, claimerUsername, donorUsername, donationType, claimStatus,scheduledelivery } = claimedItemData;
 
   try {
     // Get the base URL dynamically based on the device or environment
@@ -18,6 +18,7 @@ export async function addClaimedItem(claimedItemData) {
       donorUsername,
       donationType, // e.g., "food", "clothes", "education"
       claimStatus, // e.g., "Claimed", "Pending", "Approved"
+      scheduledelivery
     });
 
     // Handle success response
