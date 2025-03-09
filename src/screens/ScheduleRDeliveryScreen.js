@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useRoute } from '@react-navigation/native';
 import Background from "../components/Background";
 import BackButton from "../components/BackButton";
-import { StyleSheet, View, Text, TouchableOpacity, ScrollView, KeyboardAvoidingView, Platform, Dimensions } from "react-native";
+import { StyleSheet, View, Text, TouchableOpacity, ScrollView, Dimensions, Modal } from "react-native";
 import { theme } from "../core/theme";
 import Button from "../components/Button";
 import MapPicker from "../components/MapPicker";
@@ -12,14 +12,22 @@ import { Alert } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
 import { getBaseUrl } from "../helpers/deviceDetection"
 import CalendarPicker from "react-native-calendar-picker";
-import axios from 'axios';
+import { KeyboardAvoidingView, Platform, TouchableWithoutFeedback, Keyboard } from 'react-native';
+import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 
+import axios from 'axios';
 
 const GOOGLE_API_KEY = "AIzaSyB9irjntPHdEJf024h7H_XKpS11OeW1Nh8";
 
 export default function ScheduleRDeliveryScreen({ navigation }) {
   const route = useRoute();
+  const [validationErrors, setValidationErrors] = useState({
+    date: false,
+    pickupLocation: false,
+    dropOffLocation: false
+  });
   const { id = 6 } = route.params || {};
+  const [showLocationModal, setShowLocationModal] = useState(false);
 
   // State for claimed item data
   const [claimedItem, setClaimedItem] = useState(null);
@@ -39,9 +47,8 @@ export default function ScheduleRDeliveryScreen({ navigation }) {
   const [pickupCoordinates, setPickupCoordinates] = useState(null);
   const [dropOffCoordinates, setDropOffCoordinates] = useState(null);
 
-  // Map visibility state
-  const [isPickupMapVisible, setIsPickupMapVisible] = useState(false);
-  const [isDropoffMapVisible, setIsDropoffMapVisible] = useState(false);
+  // Ref for GooglePlacesAutocomplete
+  const googlePlacesRef = useRef(null);
 
   // Fetch the specific claimed item based on ID
   useEffect(() => {
@@ -100,48 +107,48 @@ export default function ScheduleRDeliveryScreen({ navigation }) {
     if (!claimerUsername) return; // Prevent running when username is empty
 
     const fetchClaimerAddress = async () => {
-        try {
-            // Step 1: Get the UID of the claimerUsername
-            const userQuery = await firestore()
-                .collection("recipients") // Collection where user details are stored
-                .where("username", "==", claimerUsername)
-                .get();
+      try {
+        // Step 1: Get the UID of the claimerUsername
+        const userQuery = await firestore()
+          .collection("recipients") // Collection where user details are stored
+          .where("username", "==", claimerUsername)
+          .get();
 
-            if (userQuery.empty) {
-                console.warn("No user found with username:", claimerUsername);
-                setClaimerAddress(""); // Clear address if user not found
-                return;
-            }
-
-            const uid = userQuery.docs[0].id; // Extract UID
-            console.log("Found UID for claimer:", uid);
-
-            // Step 2: Fetch address from IndividualProfile collection using UID
-            const profileDoc = await firestore()
-                .collection("individual_profiles")
-                .doc(uid)
-                .get();
-
-            if (!profileDoc.exists) {
-                console.warn("No profile found for UID:", uid);
-                setClaimerAddress(""); // Clear address if profile not found
-                return;
-            }
-
-            const address = profileDoc.data().address; // Extract address
-            console.log("Claimer's Address:", address);
-
-            setClaimerAddress(address); // Update state with fetched address
-            
-            // Set the claimer's address as the drop-off location
-            setDropOffLocation(address);
-            
-            // Get coordinates for the claimer's address
-            validateAndGetCoordinates(address, 'dropoff');
-        } catch (error) {
-            console.error("Error fetching claimer's address:", error);
-            setClaimerAddress(""); // Handle errors gracefully
+        if (userQuery.empty) {
+          console.warn("No user found with username:", claimerUsername);
+          setClaimerAddress(""); // Clear address if user not found
+          return;
         }
+
+        const uid = userQuery.docs[0].id; // Extract UID
+        console.log("Found UID for claimer:", uid);
+
+        // Step 2: Fetch address from IndividualProfile collection using UID
+        const profileDoc = await firestore()
+          .collection("individual_profiles")
+          .doc(uid)
+          .get();
+
+        if (!profileDoc.exists) {
+          console.warn("No profile found for UID:", uid);
+          setClaimerAddress(""); // Clear address if profile not found
+          return;
+        }
+
+        const address = profileDoc.data().address; // Extract address
+        console.log("Claimer's Address:", address);
+
+        setClaimerAddress(address); // Update state with fetched address
+
+        // Set the claimer's address as the drop-off location
+        setDropOffLocation(address);
+
+        // Get coordinates for the claimer's address
+        validateAndGetCoordinates(address, 'dropoff');
+      } catch (error) {
+        console.error("Error fetching claimer's address:", error);
+        setClaimerAddress(""); // Handle errors gracefully
+      }
     };
 
     fetchClaimerAddress();
@@ -151,22 +158,23 @@ export default function ScheduleRDeliveryScreen({ navigation }) {
   const validateAndGetCoordinates = async (address, locationType) => {
     console.log("in validateAndGetCoordinates");
     if (!address) return;
-    
+
     try {
       const response = await axios.get(
         `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${GOOGLE_API_KEY}`
       );
-      
+
       if (response.data.status === 'OK' && response.data.results.length > 0) {
         const location = response.data.results[0].geometry.location;
         const coordinates = {
           latitude: location.lat,
           longitude: location.lng
         };
-        
+
         // Format the address
         const formattedAddress = response.data.results[0].formatted_address;
-        
+        console.log("formatted address", formattedAddress);
+
         if (locationType === 'pickup') {
           setPickupCoordinates(coordinates);
           setPickupLocation(formattedAddress);
@@ -174,8 +182,10 @@ export default function ScheduleRDeliveryScreen({ navigation }) {
           setDropOffCoordinates(coordinates);
           setDropOffLocation(formattedAddress);
         }
-        
+        console.log("coordinates of drop off", coordinates);
+
         return coordinates;
+
       } else {
         console.error("Address validation failed:", response.data.status);
         Alert.alert('Invalid Address', 'Please enter a valid address');
@@ -194,70 +204,60 @@ export default function ScheduleRDeliveryScreen({ navigation }) {
     setShowTimePicker(false);
     if (selectedTime) setPickupTime(selectedTime);
   };
-
-  const handleLocationSelect = async (location, type) => {
-    // Get address from Google Maps API using reverse geocoding
-    try {
-      const response = await axios.get(
-        `https://maps.googleapis.com/maps/api/geocode/json?latlng=${location.latitude},${location.longitude}&key=${GOOGLE_API_KEY}`
-      );
-      
-      if (response.data.status === 'OK' && response.data.results.length > 0) {
-        const address = response.data.results[0].formatted_address;
-        
-        if (type === 'pickup') {
-          setPickupLocation(address);
-          setPickupCoordinates({ latitude: location.latitude, longitude: location.longitude });
-        } else if (type === 'dropoff') {
-          setDropOffLocation(address);
-          setDropOffCoordinates({ latitude: location.latitude, longitude: location.longitude });
-        }
-      } else {
-        console.error("Reverse geocoding failed:", response.data.status);
-        Alert.alert('Error', 'Failed to get address from location');
-      }
-    } catch (error) {
-      console.error("Error in reverse geocoding:", error);
-      Alert.alert('Error', 'Failed to get address from location');
-    }
-
-    // Hide the map after selection
-    setIsPickupMapVisible(false);
-    setIsDropoffMapVisible(false);
-  };
-
-  const handleCancel = () => {
-    setIsPickupMapVisible(false);
-    setIsDropoffMapVisible(false);
-  };
-
   const handleSaveDelivery = async () => {
+    console.log("handle save button");
+
+    // Reset all validation errors
+    setValidationErrors({
+      date: false,
+      pickupLocation: false,
+      dropOffLocation: false,
+      pickupCoordinates: false
+    });
+
+    // Check all required fields and set validation errors
+    let hasErrors = false;
+    let newErrors = {
+      date: false,
+      pickupLocation: false,
+      dropOffLocation: false
+    };
+
     if (!selectedStartDate) {
-      Alert.alert('Error', 'Please select a pickup date');
-      return;
+      newErrors.date = true;
+      hasErrors = true;
     }
 
     if (!pickupLocation) {
-      Alert.alert('Error', 'Please enter a pickup location');
-      return;
+      newErrors.pickupLocation = true;
+      hasErrors = true;
     }
 
     if (!dropOffLocation) {
-      Alert.alert('Error', 'Please enter a drop-off location');
+      newErrors.dropOffLocation = true;
+      hasErrors = true;
+    }
+
+    if (!pickupCoordinates) {
+      newErrors.pickupCoordinates = true;
+      hasErrors = true;
+    }
+
+    // If there are errors, update state and show alert
+    if (hasErrors) {
+      setValidationErrors(newErrors);
+
+      // Create error message based on what's missing
+      let errorMessage = "Please complete the following:\n";
+      if (newErrors.date) errorMessage += "• Select a pickup date\n";
+      if (newErrors.pickupLocation) errorMessage += "• Enter a pickup location\n";
+      if (newErrors.dropOffLocation) errorMessage += "• Enter a drop-off location\n";
+
+      Alert.alert('Missing Information', errorMessage);
       return;
     }
 
-    // Validate addresses if they were manually entered
-    if (!pickupCoordinates) {
-      const coords = await validateAndGetCoordinates(pickupLocation, 'pickup');
-      if (!coords) return;
-    }
-
-    if (!dropOffCoordinates) {
-      const coords = await validateAndGetCoordinates(dropOffLocation, 'dropoff');
-      if (!coords) return;
-    }
-
+    // If we get here, all validation passed, continue with saving
     try {
       // Save the order to Firebase
       await firestore()
@@ -315,162 +315,200 @@ export default function ScheduleRDeliveryScreen({ navigation }) {
     }
   };
 
+  // Location search modal
+  const LocationSearchModal = () => (
+    <Modal
+      visible={showLocationModal}
+      animationType="slide"
+      transparent={false}
+      onRequestClose={() => setShowLocationModal(false)}
+    >
+      <View style={styles.modalContainer}>
+        <View style={styles.modalHeader}>
+          <Text style={styles.modalTitle}>Search Pickup Location</Text>
+          <TouchableOpacity onPress={() => setShowLocationModal(false)} style={styles.closeButton}>
+            <Text style={styles.closeButtonText}>Close</Text>
+          </TouchableOpacity>
+        </View>
+
+        <GooglePlacesAutocomplete
+          ref={googlePlacesRef}
+          placeholder="Enter Pickup Location"
+          minLength={2}
+          fetchDetails={true}
+          onPress={(data, details = null) => {
+            if (details) {
+              const location = details.geometry.location;
+              setPickupLocation(details.formatted_address);
+              setPickupCoordinates({
+                latitude: location.lat,
+                longitude: location.lng
+              });
+              setShowLocationModal(false);
+            }
+          }}
+          query={{
+            key: GOOGLE_API_KEY,
+            language: 'en',
+          }}
+          styles={{
+            container: styles.autocompleteContainer,
+            textInput: styles.autocompleteInput,
+            listView: styles.autocompleteList,
+            row: styles.autocompleteRow,
+            description: styles.autocompleteDescription,
+          }}
+          enablePoweredByContainer={false}
+          keyboardShouldPersistTaps="handled"
+          listViewDisplayed={true}
+        />
+      </View>
+    </Modal>
+  );
+
   return (
     <Background>
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
-        {loading ? (
-          <Text style={styles.loadingText}>Loading item details...</Text>
-        ) : error ? (
-          <Text style={styles.errorText}>{error}</Text>
-        ) : (
-          <>
-            {/* Item Details Section */}
-            {claimedItem && (
-              <View style={styles.itemDetailsContainer}>
-                <Text style={styles.itemTitle}>{claimedItem.itemName || 'Item'}</Text>
-                {claimedItem.claimerUsername && (
-                  <Text style={styles.itemDescription}>Claimed by: {claimedItem.claimerUsername}</Text>
-                )}
-                {claimedItem.itemId&& (
-                  <Text style={styles.itemQuantity}>Item id:{claimedItem.itemId}</Text>
-                )}
-              </View>
-            )}
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={{ flex: 1 }}
+      >
 
-            {/* Calendar Section */}
-            <Text style={styles.sectionTitle}>Select Pickup Date</Text>
-            <View style={styles.calendarContainer}>
-              <CalendarPicker
-                onDateChange={onDateChange}
-                textStyle={styles.calendarText}
-                todayBackgroundColor={theme.colors.sageGreen}
-                selectedDayColor={theme.colors.sageGreen}
-                selectedDayTextColor="white"
-                width={300}
-                minDate={new Date()}
-                style={styles.calendar}
-              />
-            </View>
 
-            {selectedStartDate && (
-              <View style={styles.dateContainer}>
-                <Text style={styles.dateText}>
-                  Pickup Date: {selectedStartDate.toDateString()}
+        {/* Location Search Modal */}
+        <LocationSearchModal />
+
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+          <ScrollView
+            contentContainerStyle={styles.scrollContainer}
+            keyboardShouldPersistTaps="handled"
+          >
+            {loading ? (
+              <Text style={styles.loadingText}>Loading item details...</Text>
+            ) : error ? (
+              <Text style={styles.errorText}>{error}</Text>
+            ) : (
+              <>
+                {/* Item Details Section */}
+                {claimedItem && (
+                  <View style={styles.itemDetailsContainer}>
+                    <Text style={styles.itemTitle}>{claimedItem.itemName || 'Item'}</Text>
+                    {claimedItem.claimerUsername && (
+                      <Text style={styles.itemDescription}>Claimed by: {claimedItem.claimerUsername}</Text>
+                    )}
+                    {claimedItem.itemId && (
+                      <Text style={styles.itemQuantity}>Item id: {claimedItem.itemId}</Text>
+                    )}
+                  </View>
+                )}
+
+                {/* Calendar Section */}
+                <Text style={styles.sectionTitle}>
+                  Select Pickup Date
+                  {validationErrors.date && <Text style={styles.errorIndicator}>*</Text>}
                 </Text>
-              </View>
+                <View style={[
+                  styles.calendarContainer,
+                  validationErrors.date && styles.errorBorder
+                ]}>
+                  <CalendarPicker
+                    onDateChange={(date) => {
+                      setSelectedStartDate(date);
+                      // Clear the validation error when user selects a date
+                      if (validationErrors.date) {
+                        setValidationErrors({ ...validationErrors, date: false });
+                      }
+                    }}
+                    textStyle={styles.calendarText}
+                    todayBackgroundColor={theme.colors.sageGreen}
+                    selectedDayColor={theme.colors.sageGreen}
+                    selectedDayTextColor="white"
+                    width={300}
+                    minDate={new Date()}
+                    style={styles.calendar}
+                  />
+                </View>
+
+                {selectedStartDate && (
+                  <View style={styles.dateContainer}>
+                    <Text style={styles.dateText}>
+                      Pickup Date: {selectedStartDate.toDateString()}
+                    </Text>
+                  </View>
+                )}
+
+                {/* Time Picker Section */}
+                <Text style={styles.sectionTitle}>
+                  Select Pickup Time
+                  {validationErrors.time && <Text style={styles.errorIndicator}>*</Text>}
+                </Text>
+                <Button
+                  mode="contained"
+                  onPress={() => setShowTimePicker(true)}
+                  style={styles.button}
+                >
+                  {pickupTime ? pickupTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Set Pickup Time'}
+                </Button>
+
+                {showTimePicker && (
+                  <DateTimePicker
+                    value={pickupTime}
+                    mode="time"
+                    display="spinner"
+                    onChange={onTimeChange}
+                    themeVariant="dark"
+                    accentColor={theme.colors.sageGreen}
+                  />
+                )}
+
+                <Text style={styles.sectionTitle}>
+                  Pickup Location
+                  {validationErrors.pickupLocation && <Text style={styles.errorIndicator}>*</Text>}
+                </Text>
+                <TouchableOpacity
+                  style={styles.locationInputContainer}
+                  onPress={() => setShowLocationModal(true)}
+                >
+                  <TextInput
+                    style={[
+                      styles.input,
+                      validationErrors.pickupLocation && styles.errorBorder
+                    ]}
+                    placeholder="Tap to search for pickup location"
+                    placeholderTextColor={theme.colors.placeholder}
+                    value={pickupLocation}
+                    editable={false}
+                  />
+                </TouchableOpacity>
+
+                <Text style={styles.sectionTitle}>
+                  Drop-off Location
+                  {validationErrors.dropOffLocation && <Text style={styles.errorIndicator}>*</Text>}
+                </Text>
+                <TextInput
+                  style={[
+                    styles.input,
+                    validationErrors.dropOffLocation && styles.errorBorder
+                  ]}
+                  placeholder="Drop-Off Location (Auto-filled)"
+                  placeholderTextColor={theme.colors.placeholder}
+                  value={dropOffLocation}
+                  editable={false}
+                />
+
+                <View style={styles.saveButtonContainer}>
+                  <Button
+                    mode="contained"
+                    onPress={handleSaveDelivery}
+                    style={styles.saveButton}
+                  >
+                    Schedule Delivery
+                  </Button>
+                </View>
+              </>
             )}
-
-            {/* Time Picker Section */}
-            <Text style={styles.sectionTitle}>Select Pickup Time</Text>
-            <Button
-              mode="contained"
-              onPress={() => setShowTimePicker(true)}
-              style={styles.button}
-            >
-              {pickupTime ? pickupTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Set Pickup Time'}
-            </Button>
-
-            {showTimePicker && (
-              <DateTimePicker
-                value={pickupTime}
-                mode="time"
-                display="spinner"
-                onChange={onTimeChange}
-                themeVariant="dark"
-                accentColor={theme.colors.sageGreen}
-              />
-            )}
-
-            {/* Location Section */}
-            <Text style={styles.sectionTitle}>Pickup Location</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Enter Pickup Location"
-              placeholderTextColor={theme.colors.placeholder}
-              value={pickupLocation}
-              onChangeText={(text) => handleAddressChange(text, 'pickup')}
-            />
-            <View style={styles.buttonRow}>
-              <Button
-                mode="contained"
-                onPress={() => setIsPickupMapVisible(true)}
-                style={[styles.button, styles.rowButton]}
-                icon="map-marker"
-              >
-                Select on Map
-              </Button>
-              <Button
-                mode="contained"
-                onPress={() => validateAndGetCoordinates(pickupLocation, 'pickup')}
-                style={[styles.button, styles.rowButton]}
-              >
-                 Validate Address
-              </Button>
-            </View>
-
-            <Text style={styles.sectionTitle}>Drop-off Location</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Enter Drop-Off Location"
-              placeholderTextColor={theme.colors.placeholder}
-              value={dropOffLocation}
-              onChangeText={(text) => handleAddressChange(text, 'dropoff')}
-            />
-            <View style={styles.buttonRow}>
-              <Button
-                mode="contained"
-                onPress={() => setIsDropoffMapVisible(true)}
-                style={[styles.button, styles.rowButton]}
-                icon="map-marker"
-              >
-                Select on Map
-              </Button>
-              <Button
-                mode="contained"
-                onPress={() => validateAndGetCoordinates(dropOffLocation, 'dropoff')}
-                style={[styles.button, styles.rowButton]}
-              >
-                Validate Address
-              </Button>
-
-              
-            </View>
-              {/* Save Button - Enhanced to be more visible */}
-              <View style={styles.saveButtonContainer}>
-              <Button
-                mode="contained"
-                onPress={handleSaveDelivery}
-                style={styles.saveButton}
-                disabled={!selectedStartDate || !pickupLocation || !dropOffLocation}
-              >
-                Schedule Delivery
-              </Button>
-            </View>
-            {/* Save Button */}
-
-          </>
-        )}
-      </ScrollView>
-
-      {/* Map Overlays */}
-      {isPickupMapVisible && (
-        <View style={styles.mapOverlay}>
-          <MapPicker
-            onLocationSelect={(location) => handleLocationSelect(location, "pickup")}
-            onCancel={handleCancel}
-            buttonStyle={styles.mapButtons}
-          />
-        </View>
-      )}
-      {isDropoffMapVisible && (
-        <View style={styles.mapOverlay}>
-          <MapPicker
-            onLocationSelect={(location) => handleLocationSelect(location, "dropoff")}
-            onCancel={handleCancel}
-            buttonStyle={styles.mapButtons}
-          />
-        </View>
-      )}
+          </ScrollView>
+        </TouchableWithoutFeedback>
+      </KeyboardAvoidingView>
     </Background>
   );
 }
@@ -486,7 +524,7 @@ const styles = StyleSheet.create({
     color: theme.colors.ivory,
     textAlign: 'center',
     marginBottom: 20,
-    marginTop:20,
+    marginTop: 20,
   },
   calendarContainer: {
     backgroundColor: theme.colors.ivory,
@@ -504,18 +542,18 @@ const styles = StyleSheet.create({
     height: 390,
   },
   calendarText: {
-    fontSize: 14, // Change the font size for calendar dates
+    fontSize: 14,
     color: theme.colors.background,
   },
   dateContainer: {
     marginTop: 20,
-    alignItems: "left",
+    alignItems: "flex-start",
   },
   dateText: {
     fontSize: 18,
     color: theme.colors.ivory,
     textAlign: 'left',
-    paddingLeft:5,
+    paddingLeft: 5,
   },
   timeButton: {
     marginTop: 20,
@@ -542,13 +580,16 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   input: {
-    width: "90%",
-    height: 25,
+    width: "100%",
+    height: 30,
     padding: 15,
     borderWidth: 1,
     borderColor: theme.colors.sageGreen,
     borderRadius: 7,
     backgroundColor: theme.colors.ivory,
+  },
+  locationInputContainer: {
+    width: '100%',
   },
   mapOverlay: {
     position: "absolute",
@@ -559,10 +600,10 @@ const styles = StyleSheet.create({
   },
   backButtonWrapper: {
     position: 'absolute',
-    top: 5, 
-    left: 0, 
+    top: 5,
+    left: 0,
+    zIndex: 10,
   },
-  // New styles for the button row
   buttonRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -570,7 +611,7 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   rowButton: {
-    flex: 0.48, // This makes each button take up slightly less than half the space
+    flex: 0.48,
   },
   button: {
     marginBottom: 10,
@@ -586,14 +627,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 20,
     bottom: 20,
-    marginBottom: 40, // Add more bottom margin to ensure it's visible
+    marginBottom: 40,
   },
   saveButton: {
     width: '100%',
     backgroundColor: theme.colors.sageGreen,
     paddingVertical: 12,
     borderRadius: 8,
-    // Add shadow for better visibility
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
@@ -603,10 +643,9 @@ const styles = StyleSheet.create({
     shadowRadius: 3.84,
     elevation: 5,
   },
-  // Style for map buttons to position them higher
   mapButtons: {
     position: 'absolute',
-    bottom: 400, // Moved up from the bottom
+    bottom: 400,
     left: 0,
     right: 0,
     flexDirection: 'row',
@@ -654,5 +693,81 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: theme.colors.ivory,
     fontWeight: '500',
+  },
+  // Modal styles
+  modalContainer: {
+    flex: 1,
+    backgroundColor: theme.colors.ivory,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colors.sageGreen,
+    backgroundColor: theme.colors.sageGreen,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: theme.colors.ivory,
+  },
+  closeButton: {
+    padding: 8,
+  },
+  closeButtonText: {
+    color: theme.colors.ivory,
+    fontSize: 16,
+  },
+  // Autocomplete styles
+  autocompleteContainer: {
+    flex: 1,
+    width: '100%',
+    paddingHorizontal: 15,
+  },
+  autocompleteInput: {
+    height: 50,
+    fontSize: 16,
+    backgroundColor: theme.colors.ivory,
+    borderWidth: 1,
+    borderColor: theme.colors.sageGreen,
+    borderRadius: 5,
+    marginTop: 10,
+    paddingHorizontal: 10,
+  },
+  autocompleteList: {
+    backgroundColor: theme.colors.ivory,
+    borderWidth: 1,
+    borderColor: theme.colors.sageGreen,
+    borderRadius: 5,
+    marginTop: 5,
+  },
+  autocompleteRow: {
+    padding: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+  },
+  autocompleteDescription: {
+    fontSize: 16,
+    color: '#333',
+  },
+  errorIndicator: {
+    color: '#ff3333',
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginLeft: 5,
+  },
+  errorBorder: {
+    borderColor: '#ff3333',
+    borderWidth: 2,
+  },
+  validationErrorText: {
+    color: '#ff3333',
+    fontSize: 14,
+    marginTop: 5,
+    marginBottom: 10,
+    alignSelf: 'flex-start',
+    marginLeft: '5%',
   },
 });
