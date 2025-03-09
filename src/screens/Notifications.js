@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { View, Text, Button, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, Button, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import axios from 'axios';
 import { AuthContext } from '../context/AuthContext'; // Import AuthContext
 import { getBaseUrl } from '../helpers/deviceDetection';
@@ -85,28 +85,29 @@ const Notifications = ({ route }) => {
             </View>
 
             {message && <Text style={styles.message}>{message}</Text>}
-            {notifications.length > 0 ? (
-                notifications.map((item) => (
-                    <View key={item.id} style={styles.notificationItem}>
-                                                <Text style={styles.itemText}>Date of Claim: {item.claimDate}</Text>
+            <ScrollView contentContainerStyle={styles.scrollViewContent}>
+                {notifications.length > 0 ? (
+                    notifications.map((item) => (
+                        <View key={item.id} style={styles.notificationItem}>
+                            <Text style={styles.itemText}>Date of Claim: {item.claimDate}</Text>
+                            <Text style={styles.itemText}>Item type: {item.donationType}</Text>
+                            <Text style={styles.itemText}>Claimed by: {item.claimerUsername}</Text>
+                            <Text style={styles.itemText}>Item name: {item.itemName}</Text>
 
-                        <Text style={styles.itemText}>Item type: {item.donationType}</Text>
-                        <Text style={styles.itemText}>Claimed by: {item.claimerUsername}</Text>
-                        <Text style={styles.itemText}>Item name: {item.itemName}</Text>
-
-                        <View style={styles.buttonContainer}>
-                            <TouchableOpacity style={styles.approveButton} onPress={() => handleApprove(item.id)}>
-                                <Text style={styles.buttonText}>Approve</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity style={styles.declineButton} onPress={() => declineClaim(item.id)}>
-                                <Text style={styles.buttonText}>Decline</Text>
-                            </TouchableOpacity>
+                            <View style={styles.buttonContainer}>
+                                <TouchableOpacity style={styles.approveButton} onPress={() => handleApprove(item.id)}>
+                                    <Text style={styles.buttonText}>Approve</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity style={styles.declineButton} onPress={() => declineClaim(item.id)}>
+                                    <Text style={styles.buttonText}>Decline</Text>
+                                </TouchableOpacity>
+                            </View>
                         </View>
-                    </View>
-                ))
-            ) : (
-                <Text style={styles.noNotificationText}>No new notifications.</Text>
-            )}
+                    ))
+                ) : (
+                    <Text style={styles.noNotificationText}>No new notifications.</Text>
+                )}
+            </ScrollView>
         </View>
     );
 };
@@ -120,12 +121,12 @@ const styles = StyleSheet.create({
     header: {
         padding: 20,
         alignItems: 'center',
-        borderBottomLeftRadius: 10,
-        borderBottomRightRadius: 10,
+        borderBottomLeftRadius: 20,
+        borderBottomRightRadius: 20,
         backgroundColor: theme.colors.sageGreen,
     },
     title: {
-        fontSize: 28,
+        fontSize: 30,
         color: theme.colors.ivory,
         fontWeight: 'bold',
     },
@@ -133,11 +134,15 @@ const styles = StyleSheet.create({
         color: theme.colors.ivory,
         textAlign: 'center',
         marginVertical: 10,
+        fontSize: 16,
+    },
+    scrollViewContent: {
+        paddingBottom: 20, // Extra padding for the scrollable content
     },
     notificationItem: {
-        backgroundColor: theme.colors.TaupeBlack,
-        padding: 15,
-        borderRadius: 10,
+        backgroundColor: theme.colors.outerSpace,
+        padding: 20,
+        borderRadius: 15,
         marginBottom: 20,
         borderWidth: 2,
         borderColor: theme.colors.sageGreen,
@@ -145,6 +150,7 @@ const styles = StyleSheet.create({
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.5,
         shadowRadius: 8,
+        elevation: 5,
     },
     itemText: {
         fontSize: 18,
@@ -154,20 +160,22 @@ const styles = StyleSheet.create({
     buttonContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
+        marginTop: 10,
     },
     approveButton: {
         backgroundColor: theme.colors.sageGreen,
         padding: 10,
-        borderRadius: 10,
+        borderRadius: 15,
     },
     declineButton: {
-        backgroundColor: theme.colors.outerSpace,
+        backgroundColor: theme.colors.copper,
         padding: 10,
-        borderRadius: 10,
+        borderRadius: 15,
     },
     buttonText: {
         color: theme.colors.ivory,
         fontWeight: 'bold',
+        fontSize: 16,
     },
     noNotificationText: {
         fontSize: 18,
