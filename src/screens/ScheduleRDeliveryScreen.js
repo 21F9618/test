@@ -2,23 +2,24 @@ import React, { useState, useEffect } from "react";
 import { useRoute } from '@react-navigation/native';
 import Background from "../components/Background";
 import BackButton from "../components/BackButton";
-import CalendarPicker from "react-native-calendar-picker";
 import { StyleSheet, View, Text, TouchableOpacity, ScrollView, KeyboardAvoidingView, Platform, Dimensions } from "react-native";
 import { theme } from "../core/theme";
 import Button from "../components/Button";
 import MapPicker from "../components/MapPicker";
 import TextInput from "../components/TextInput";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import axios from 'axios';
 import { Alert } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
 import { getBaseUrl } from "../helpers/deviceDetection"
+import CalendarPicker from "react-native-calendar-picker";
+import axios from 'axios';
 
+
+const GOOGLE_API_KEY = "AIzaSyB9irjntPHdEJf024h7H_XKpS11OeW1Nh8";
 
 export default function ScheduleRDeliveryScreen({ navigation }) {
   const route = useRoute();
   const { id = 6 } = route.params || {};
-
 
   // State for claimed item data
   const [claimedItem, setClaimedItem] = useState(null);
@@ -95,9 +96,6 @@ export default function ScheduleRDeliveryScreen({ navigation }) {
     }
   };
 
-
-
-
   useEffect(() => {
     if (!claimerUsername) return; // Prevent running when username is empty
 
@@ -134,6 +132,12 @@ export default function ScheduleRDeliveryScreen({ navigation }) {
             console.log("Claimer's Address:", address);
 
             setClaimerAddress(address); // Update state with fetched address
+            
+            // Set the claimer's address as the drop-off location
+            setDropOffLocation(address);
+            
+            // Get coordinates for the claimer's address
+            validateAndGetCoordinates(address, 'dropoff');
         } catch (error) {
             console.error("Error fetching claimer's address:", error);
             setClaimerAddress(""); // Handle errors gracefully
@@ -141,32 +145,46 @@ export default function ScheduleRDeliveryScreen({ navigation }) {
     };
 
     fetchClaimerAddress();
-}, [claimerUsername]); // Runs when claimerUsername changes
+  }, [claimerUsername]); // Runs when claimerUsername changes
 
-
-  const getAddressFromCoordinates = async (latitude, longitude) => {
-    const url = `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`;
-
+  // Validate address and get coordinates using Google Maps API
+  const validateAndGetCoordinates = async (address, locationType) => {
+    console.log("in validateAndGetCoordinates");
+    if (!address) return;
+    
     try {
-      const response = await axios.get(url, {
-        headers: {
-          'User-Agent': 'dast-e-khair/1.0 (zhalaym@gmaile.com)',
-        },
-      });
-
-      const fetchedAddress = response.data.display_name;
-      const filteredAddress = fetchedAddress
-        .replace(/[^a-zA-Z0-9,.-]/g, '')
-        .replace(/\s+/g, '')
-        .replace(/,+/g, ',')
-        .replace(/^,|,$/g, '');
-
-      console.log("Filtered Address:", filteredAddress);
-      return filteredAddress;
+      const response = await axios.get(
+        `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${GOOGLE_API_KEY}`
+      );
+      
+      if (response.data.status === 'OK' && response.data.results.length > 0) {
+        const location = response.data.results[0].geometry.location;
+        const coordinates = {
+          latitude: location.lat,
+          longitude: location.lng
+        };
+        
+        // Format the address
+        const formattedAddress = response.data.results[0].formatted_address;
+        
+        if (locationType === 'pickup') {
+          setPickupCoordinates(coordinates);
+          setPickupLocation(formattedAddress);
+        } else if (locationType === 'dropoff') {
+          setDropOffCoordinates(coordinates);
+          setDropOffLocation(formattedAddress);
+        }
+        
+        return coordinates;
+      } else {
+        console.error("Address validation failed:", response.data.status);
+        Alert.alert('Invalid Address', 'Please enter a valid address');
+        return null;
+      }
     } catch (error) {
-      setError('Error fetching address');
-      console.error("Error fetching address:", error.message || error);
-      return 'Unknown Address';
+      console.error("Error validating address:", error);
+      Alert.alert('Error', 'Failed to validate address');
+      return null;
     }
   };
 
@@ -178,14 +196,29 @@ export default function ScheduleRDeliveryScreen({ navigation }) {
   };
 
   const handleLocationSelect = async (location, type) => {
-    const address = await getAddressFromCoordinates(location.latitude, location.longitude);
-
-    if (type === 'pickup') {
-      setPickupLocation(address);
-      setPickupCoordinates({ latitude: location.latitude, longitude: location.longitude });
-    } else if (type === 'dropoff') {
-      setDropOffLocation(address);
-      setDropOffCoordinates({ latitude: location.latitude, longitude: location.longitude });
+    // Get address from Google Maps API using reverse geocoding
+    try {
+      const response = await axios.get(
+        `https://maps.googleapis.com/maps/api/geocode/json?latlng=${location.latitude},${location.longitude}&key=${GOOGLE_API_KEY}`
+      );
+      
+      if (response.data.status === 'OK' && response.data.results.length > 0) {
+        const address = response.data.results[0].formatted_address;
+        
+        if (type === 'pickup') {
+          setPickupLocation(address);
+          setPickupCoordinates({ latitude: location.latitude, longitude: location.longitude });
+        } else if (type === 'dropoff') {
+          setDropOffLocation(address);
+          setDropOffCoordinates({ latitude: location.latitude, longitude: location.longitude });
+        }
+      } else {
+        console.error("Reverse geocoding failed:", response.data.status);
+        Alert.alert('Error', 'Failed to get address from location');
+      }
+    } catch (error) {
+      console.error("Error in reverse geocoding:", error);
+      Alert.alert('Error', 'Failed to get address from location');
     }
 
     // Hide the map after selection
@@ -214,19 +247,39 @@ export default function ScheduleRDeliveryScreen({ navigation }) {
       return;
     }
 
+    // Validate addresses if they were manually entered
+    if (!pickupCoordinates) {
+      const coords = await validateAndGetCoordinates(pickupLocation, 'pickup');
+      if (!coords) return;
+    }
+
+    if (!dropOffCoordinates) {
+      const coords = await validateAndGetCoordinates(dropOffLocation, 'dropoff');
+      if (!coords) return;
+    }
+
     try {
-      // Here you would save the delivery details to your backend
-      // const BASE_URL = await getBaseUrl();
-      // const endpoint = `${BASE_URL}/api/schedule-delivery`;
-      // await axios.post(endpoint, {
-      //   claimedItemId: id,
-      //   pickupDate: selectedStartDate,
-      //   pickupTime: pickupTime,
-      //   pickupLocation,
-      //   pickupCoordinates,
-      //   dropOffLocation,
-      //   dropOffCoordinates
-      // });
+      // Save the order to Firebase
+      await firestore()
+        .collection('orders')
+        .doc(id.toString()) // Use the claimed item ID as the order ID
+        .set({
+          orderId: id,
+          origin: {
+            latitude: pickupCoordinates.latitude,
+            longitude: pickupCoordinates.longitude,
+            address: pickupLocation
+          },
+          destination: {
+            latitude: dropOffCoordinates.latitude,
+            longitude: dropOffCoordinates.longitude,
+            address: dropOffLocation
+          },
+          pickupDate: selectedStartDate.toISOString(),
+          pickupTime: pickupTime.toISOString(),
+          status: 'pending',
+          createdAt: firestore.FieldValue.serverTimestamp()
+        });
 
       // Show success alert
       Alert.alert(
@@ -249,6 +302,19 @@ export default function ScheduleRDeliveryScreen({ navigation }) {
     }
   };
 
+  // Handle address input change and validation
+  const handleAddressChange = (text, type) => {
+    if (type === 'pickup') {
+      setPickupLocation(text);
+      // Clear coordinates when manually editing
+      setPickupCoordinates(null);
+    } else if (type === 'dropoff') {
+      setDropOffLocation(text);
+      // Clear coordinates when manually editing
+      setDropOffCoordinates(null);
+    }
+  };
+
   return (
     <Background>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
@@ -261,13 +327,12 @@ export default function ScheduleRDeliveryScreen({ navigation }) {
             {/* Item Details Section */}
             {claimedItem && (
               <View style={styles.itemDetailsContainer}>
-                <Text style={styles.header}>Schedule Delivery</Text>
-                <Text style={styles.itemTitle}>{claimedItem.name || 'Item'}</Text>
-                {claimedItem.description && (
-                  <Text style={styles.itemDescription}>{claimedItem.description}</Text>
+                <Text style={styles.itemTitle}>{claimedItem.itemName || 'Item'}</Text>
+                {claimedItem.claimerUsername && (
+                  <Text style={styles.itemDescription}>Claimed by: {claimedItem.claimerUsername}</Text>
                 )}
-                {claimedItem.quantity && (
-                  <Text style={styles.itemQuantity}>Quantity: {claimedItem.quantity}</Text>
+                {claimedItem.itemId&& (
+                  <Text style={styles.itemQuantity}>Item id:{claimedItem.itemId}</Text>
                 )}
               </View>
             )}
@@ -323,16 +388,25 @@ export default function ScheduleRDeliveryScreen({ navigation }) {
               placeholder="Enter Pickup Location"
               placeholderTextColor={theme.colors.placeholder}
               value={pickupLocation}
-              onChangeText={(text) => setPickupLocation(text)}
+              onChangeText={(text) => handleAddressChange(text, 'pickup')}
             />
-            <Button
-              mode="contained"
-              onPress={() => setIsPickupMapVisible(true)}
-              style={styles.button}
-              icon="map-marker"
-            >
-              Select on Map
-            </Button>
+            <View style={styles.buttonRow}>
+              <Button
+                mode="contained"
+                onPress={() => setIsPickupMapVisible(true)}
+                style={[styles.button, styles.rowButton]}
+                icon="map-marker"
+              >
+                Select on Map
+              </Button>
+              <Button
+                mode="contained"
+                onPress={() => validateAndGetCoordinates(pickupLocation, 'pickup')}
+                style={[styles.button, styles.rowButton]}
+              >
+                 Validate Address
+              </Button>
+            </View>
 
             <Text style={styles.sectionTitle}>Drop-off Location</Text>
             <TextInput
@@ -340,26 +414,40 @@ export default function ScheduleRDeliveryScreen({ navigation }) {
               placeholder="Enter Drop-Off Location"
               placeholderTextColor={theme.colors.placeholder}
               value={dropOffLocation}
-              onChangeText={(text) => setDropOffLocation(text)}
+              onChangeText={(text) => handleAddressChange(text, 'dropoff')}
             />
-            <Button
-              mode="contained"
-              onPress={() => setIsDropoffMapVisible(true)}
-              style={styles.button}
-              icon="map-marker"
-            >
-              Select on Map
-            </Button>
+            <View style={styles.buttonRow}>
+              <Button
+                mode="contained"
+                onPress={() => setIsDropoffMapVisible(true)}
+                style={[styles.button, styles.rowButton]}
+                icon="map-marker"
+              >
+                Select on Map
+              </Button>
+              <Button
+                mode="contained"
+                onPress={() => validateAndGetCoordinates(dropOffLocation, 'dropoff')}
+                style={[styles.button, styles.rowButton]}
+              >
+                Validate Address
+              </Button>
 
+              
+            </View>
+              {/* Save Button - Enhanced to be more visible */}
+              <View style={styles.saveButtonContainer}>
+              <Button
+                mode="contained"
+                onPress={handleSaveDelivery}
+                style={styles.saveButton}
+                disabled={!selectedStartDate || !pickupLocation || !dropOffLocation}
+              >
+                Schedule Delivery
+              </Button>
+            </View>
             {/* Save Button */}
-            <Button
-              mode="contained"
-              onPress={handleSaveDelivery}
-              style={styles.saveButton}
-              disabled={!selectedStartDate || !pickupLocation || !dropOffLocation}
-            >
-              Schedule Delivery
-            </Button>
+
           </>
         )}
       </ScrollView>
@@ -370,6 +458,7 @@ export default function ScheduleRDeliveryScreen({ navigation }) {
           <MapPicker
             onLocationSelect={(location) => handleLocationSelect(location, "pickup")}
             onCancel={handleCancel}
+            buttonStyle={styles.mapButtons}
           />
         </View>
       )}
@@ -378,6 +467,7 @@ export default function ScheduleRDeliveryScreen({ navigation }) {
           <MapPicker
             onLocationSelect={(location) => handleLocationSelect(location, "dropoff")}
             onCancel={handleCancel}
+            buttonStyle={styles.mapButtons}
           />
         </View>
       )}
@@ -385,11 +475,10 @@ export default function ScheduleRDeliveryScreen({ navigation }) {
   );
 }
 
-
 const styles = StyleSheet.create({
   scrollContainer: {
     flexGrow: 1,
-    paddingBottom: 30,
+    paddingBottom: 50,
   },
   header: {
     fontSize: 24,
@@ -397,18 +486,18 @@ const styles = StyleSheet.create({
     color: theme.colors.ivory,
     textAlign: 'center',
     marginBottom: 20,
-    marginTop: 20,
+    marginTop:20,
   },
   calendarContainer: {
     backgroundColor: theme.colors.ivory,
     width: '100%',
     height: '30%',
     alignItems: 'center',
-    marginBottom: 5,
+    marginBottom: 1,
     borderWidth: 4,
     borderColor: theme.colors.sageGreen,
-    borderRadius: 8,
-    padding: 10,
+    borderRadius: 4,
+    padding: 5,
   },
   calendar: {
     width: '100%',
@@ -426,7 +515,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: theme.colors.ivory,
     textAlign: 'left',
-    paddingLeft: 5,
+    paddingLeft:5,
   },
   timeButton: {
     marginTop: 20,
@@ -461,20 +550,109 @@ const styles = StyleSheet.create({
     borderRadius: 7,
     backgroundColor: theme.colors.ivory,
   },
-
   mapOverlay: {
     position: "absolute",
     top: 0,
-    bottom: 0,
+    bottom: 40,
     left: 0,
     right: 0,
   },
   backButtonWrapper: {
     position: 'absolute',
-    top: 5,
+    top: 5, 
+    left: 0, 
+  },
+  // New styles for the button row
+  buttonRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '90%',
+    marginBottom: 15,
+  },
+  rowButton: {
+    flex: 0.48, // This makes each button take up slightly less than half the space
+  },
+  button: {
+    marginBottom: 10,
+  },
+  validateButton: {
+    borderColor: theme.colors.sageGreen,
+  },
+  useAddressButton: {
+    borderColor: theme.colors.sageGreen,
+  },
+  saveButtonContainer: {
+    width: '90%',
+    alignItems: 'center',
+    marginTop: 20,
+    bottom: 20,
+    marginBottom: 40, // Add more bottom margin to ensure it's visible
+  },
+  saveButton: {
+    width: '100%',
+    backgroundColor: theme.colors.sageGreen,
+    paddingVertical: 12,
+    borderRadius: 8,
+    // Add shadow for better visibility
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  // Style for map buttons to position them higher
+  mapButtons: {
+    position: 'absolute',
+    bottom: 400, // Moved up from the bottom
     left: 0,
+    right: 0,
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    padding: 10,
+  },
+  itemDetailsContainer: {},
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: theme.colors.ivory,
+    marginTop: 15,
+    marginBottom: 10,
+  },
+  claimerAddressContainer: {},
+  addressText: {
+    fontSize: 16,
+    color: theme.colors.ivory,
+    marginBottom: 10,
+  },
+  loadingText: {
+    fontSize: 18,
+    color: theme.colors.ivory,
+    textAlign: 'center',
+    marginTop: 50,
+  },
+  errorText: {
+    fontSize: 18,
+    color: '#ff6b6b',
+    textAlign: 'center',
+    marginTop: 50,
+  },
+  itemTitle: {
+    fontSize: 20,
+    fontWeight: '600',
+    color: theme.colors.ivory,
+    marginBottom: 8,
+  },
+  itemDescription: {
+    fontSize: 16,
+    color: theme.colors.ivory,
+    marginBottom: 8,
+  },
+  itemQuantity: {
+    fontSize: 16,
+    color: theme.colors.ivory,
+    fontWeight: '500',
   },
 });
-
-
-
