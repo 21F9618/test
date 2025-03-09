@@ -41,7 +41,7 @@ function TabNavigator({navigation, route}) {
   <Tab.Screen name="Notifications" component={Notifications} options={{
     headerShown: false,
     tabBarIcon: ({ color }) => <Ionicons name="notifications" size={24} color={color} />
-  }} />
+  }} initialParams={{ ...route.params }}/>
 )}
 
      

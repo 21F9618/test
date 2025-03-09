@@ -40,7 +40,7 @@ const createTables = () => {
     const foodDonationsTable = `
       CREATE TABLE IF NOT EXISTS FoodDonations (
         id INT AUTO_INCREMENT PRIMARY KEY,
-        foodName VARCHAR(255) NOT NULL,
+        itemName VARCHAR(255) NOT NULL,
         description VARCHAR(100),
         mealType VARCHAR(255) NOT NULL,
         foodType VARCHAR(255) NOT NULL,
@@ -58,12 +58,8 @@ const createTables = () => {
       CREATE TABLE IF NOT EXISTS ClothesDonations (
     id INT AUTO_INCREMENT PRIMARY KEY,
     fabric VARCHAR(255) NOT NULL,
-    itemCategory VARCHAR(255) NOT NULL,
-    clothesCategory VARCHAR(255) NOT NULL,
-    shoeSize VARCHAR(255)  DEFAULT '-',
-    upperWearSize VARCHAR(255)  DEFAULT '-',
-    bottomWearSize VARCHAR(255)  DEFAULT '-',
-    clothingSize VARCHAR(255)  DEFAULT '-',
+    itemName VARCHAR(255) NOT NULL,
+    size VARCHAR(10) NOT NULL,
     c_condition VARCHAR(50) NOT NULL,
     gender VARCHAR(50) NOT NULL,
     quantity INT NOT NULL,
@@ -77,6 +73,24 @@ const createTables = () => {
 );
 
     `;
+    const claimedItemsTable = `
+      CREATE TABLE IF NOT EXISTS ClaimedItems (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        itemName VARCHAR(255) NOT NULL,
+
+        donorUsername VARCHAR(255) NOT NULL,
+        claimerUsername VARCHAR(255) NOT NULL,
+        donationType VARCHAR(255) NOT NULL, -- Type of donation (e.g., food, clothes, education)
+        itemId INT NOT NULL, -- The ID of the donated item
+        claimDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        scheduledelivery VARCHAR(255) DEFAULT 'Unscehduled',
+        claimStatus VARCHAR(255) DEFAULT 'Claimed',
+      );
+
+    `;
+
+
+
 
     const educationDonationsTable = `
   CREATE TABLE IF NOT EXISTS EducationDonations (
@@ -89,9 +103,6 @@ const createTables = () => {
     description TEXT NOT NULL,
     images TEXT,
     subject VARCHAR(255)  DEFAULT '-',
-    institution VARCHAR(255)  DEFAULT '-',
-    grade VARCHAR(255)  DEFAULT '-',
-
     createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     claimStatus VARCHAR(255) DEFAULT 'Unclaimed',
     donorUsername VARCHAR(255) NOT NULL
@@ -106,7 +117,13 @@ const createTables = () => {
         console.log('Donations table created successfully');
       }
     });
-  
+    db.query(claimedItemsTable, (err, result) => {
+      if (err) {
+        console.log('Error creating ClaimedItems table:', err);
+      } else {
+        console.log('ClaimedItems table created successfully');
+      }
+    });
     db.query(foodDonationsTable, (err, result) => {
       if (err) {
         console.log('Error creating FoodDonations table:', err);
@@ -114,7 +131,7 @@ const createTables = () => {
         console.log('FoodDonations table created successfully');
       }
     });
-  
+    
     db.query(clothesDonationsTable, (err, result) => {
       if (err) {
         console.log('Error creating ClothesDonations table:', err);
@@ -129,31 +146,64 @@ const createTables = () => {
         console.log('EducationDonations table created successfully');
       }
     });
-
-    
   };
   
   // Call the function to create the tables
   createTables();
+  app.post('/api/add-claimed-item', (req, res) => {
+    console.log(req.body);
+    const { donorUsername, claimerUsername, donationType,claimStatus,itemName, itemId,scheduledelivery } = req.body;
+    // const claimStatus = 'Claimed';
+
+    console.log("Received data:", { donorUsername, claimerUsername, donationType,itemName, itemId, claimStatus,scheduledelivery });
+
+    // Query to insert a claimed item into the ClaimedItems table
+    const query = `
+      INSERT INTO ClaimedItems (donorUsername, claimerUsername, donationType,itemName, itemId, claimStatus,scheduledelivery)
+      VALUES (?, ?, ?, ?, ?,?,?)
+    `;
+
+    // Log the data being passed to the query
+    console.log('Executing query with:', [donorUsername, claimerUsername, donationType,    itemName ,
+      itemId,scheduledelivery,claimStatus|| 'Claimed']);
+
+    // Execute the query
+    db.query(query, [donorUsername, claimerUsername, donationType,itemName, itemId,scheduledelivery, claimStatus || 'Claimed'], (err, results) => {
+        if (err) {
+            console.error('Error inserting claimed item:', err);
+            return res.status(500).send('Error claiming item');
+        }
+        console.log('Insert result:', results); // Log the results to ensure insertion
+        res.status(200).send('Item claimed successfully');
+    });
+});
+
+
+
+
+
+
+
+
 
   // API endpoint to add a food donation
 
 
   app.post('/api/add-food-donation', (req, res) => {
     console.log(req.body);
-    const { foodName, description, mealType, foodType, quantity, images, donorUsername } = req.body;
+    const { itemName, description, mealType, foodType, quantity, images, donorUsername } = req.body;
   
-    console.log("Received data:", { foodName, description, mealType, foodType, quantity, images, donorUsername });
+    console.log("Received data:", { itemName, description, mealType, foodType, quantity, images, donorUsername });
   
     const query = `
-      INSERT INTO FoodDonations (foodName, description, mealType, foodType, quantity, images, donorUsername)
+      INSERT INTO FoodDonations (itemName, description, mealType, foodType, quantity, images, donorUsername)
       VALUES (?, ?, ?, ?, ?, ?, ?)
     `;
   
     // Log the data being passed to the query
-    console.log('Executing query with:', [foodName, description, mealType, foodType, quantity, JSON.stringify(images), donorUsername]);
+    console.log('Executing query with:', [itemName, description, mealType, foodType, quantity, JSON.stringify(images), donorUsername]);
   
-    db.query(query, [foodName, description, mealType, foodType, quantity, JSON.stringify(images), donorUsername], (err, results) => {
+    db.query(query, [itemName, description, mealType, foodType, quantity, JSON.stringify(images), donorUsername], (err, results) => {
       if (err) {
         console.error('Error inserting food donation:', err);
         return res.status(500).send('Error inserting food donation');
@@ -174,33 +224,19 @@ const createTables = () => {
   app.post('/api/add-clothes-donation', (req, res) => {
     console.log("hjeree");
     console.log(req.body);
-    const { season, gender, ageCategory, itemCategory,  clothesCategory,
-      shoeSize,
-      upperWearSize,
-      bottomWearSize,
-      clothingSize, c_condition, quantity, fabric, description, images, donorUsername } = req.body;
+    const { season, gender,itemName, ageCategory, size, c_condition, quantity, fabric, description, images, donorUsername } = req.body;
   
-    console.log("Received data:", { season, gender, ageCategory,itemCategory, clothesCategory,
-      shoeSize,
-      upperWearSize,
-      bottomWearSize,
-      clothingSize,  c_condition, quantity, fabric, description, images, donorUsername });
+    console.log("Received data:", { season, gender, itemName, ageCategory, size, c_condition, quantity, fabric, description, images, donorUsername });
   
     const query = `
-      INSERT INTO clothesdonations (season, gender,  age_category, itemCategory, clothesCategory,
-       shoeSize,
-      upperWearSize,
-      bottomWearSize,
-      clothingSize,  c_condition, quantity, fabric, description, images, donorUsername)
-      VALUES (?, ?, ?,?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?)
+      INSERT INTO clothesdonations (season,itemName, gender,  age_category, size, c_condition, quantity, fabric, description, images, donorUsername)
+      VALUES (?, ?, ?,?, ?, ?, ?, ?, ?, ?, ?)
     `;
   
     // Log the data being passed to the query
-    console.log('Executing query with:', [season, gender, ageCategory, itemCategory, clothesCategory, shoeSize, upperWearSize, bottomWearSize,
-      clothingSize, c_condition, quantity, fabric, description, JSON.stringify(images), donorUsername]);
+    console.log('Executing query with:', [season, gender, ageCategory, size, c_condition, quantity, fabric, description, JSON.stringify(images), donorUsername]);
   
-    db.query(query, [season, gender, ageCategory, itemCategory, clothesCategory, shoeSize, upperWearSize, bottomWearSize,
-      clothingSize, c_condition, quantity, fabric, description, JSON.stringify(images), donorUsername], (err, results) => {
+    db.query(query, [season,itemName, gender, ageCategory, size, c_condition, quantity, fabric, description, JSON.stringify(images), donorUsername], (err, results) => {
       if (err) {
         console.error('Error inserting clothes donation:', err);
         return res.status(500).send('Error inserting clothes donation');
@@ -210,50 +246,7 @@ const createTables = () => {
     });
 });
 
-app.get("/api/food-donations", (req, res) => {
-  const userProfile = JSON.parse(req.query.userProfile || "{}")
-  const membersCount = userProfile.membersCount || 0
-
-  // Query for all unclaimed food donations
-  const query = "SELECT * FROM fooddonations WHERE claimStatus = ?"
-
-  db.query(query, ["Unclaimed"], (err, results) => {
-    if (err) {
-      console.error("Error fetching data:", err)
-      return res.status(500).send("Error fetching data")
-    }
-
-    // Function to check if a food item is recommended based on quantity
-    const isRecommended = (item) => {
-      // Check if the donation quantity is appropriate for the family size
-      // Recommend items where quantity is sufficient but not excessive for the family
-      
-      return item.quantity >= membersCount && item.quantity <= membersCount * 1.5
-    }
-
-    // Filter recommendations
-    const recommended = results.filter(isRecommended)
-
-    // Filter other items that do not match the quantity criteria
-    const others = results.filter((item) => !isRecommended(item))
-
-    // Sort both arrays by createdAt in descending order
-    const sortByCreatedAt = (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-    recommended.sort(sortByCreatedAt)
-    others.sort(sortByCreatedAt)
-    console.log(recommended);
-    console.log(others);
-
-    res.json({
-      recommended: recommended,
-      others: others,
-    })
-  })
-})
-
-
-
-app.get('/api/all-food-donations', (req, res) => {
+app.get('/api/food-donations', (req, res) => {
     const query = 'SELECT * FROM FoodDonations WHERE claimStatus = ?';
     db.query(query, ['Unclaimed'], (err, results) => {
       if (err) {
@@ -263,10 +256,54 @@ app.get('/api/all-food-donations', (req, res) => {
       res.json(results);
     });
   });
-  /*
-  app.get('/api/clothes-donations', (req, res) => {
 
-    
+  
+//   app.get('/api/claimed-items', (req, res) => {
+//     const query = 'SELECT * FROM ClaimedItems';
+
+//     // Execute the database query
+//     db.query(query, (err, results) => { // Removed ['Claimed'] parameter
+//         if (err) {
+//             console.error('Error fetching claimed items:', err);
+//             return res.status(500).json({
+//                 status: 'error',
+//                 message: 'Error fetching claimed items',
+//                 error: err.message, 
+//             });
+//         }
+
+//         return res.status(200).json({
+//             status: 'success',
+//             data: results,
+//         });
+//     });
+// });
+
+
+app.get('/api/claimed-items', (req, res) => {
+  const query = "SELECT * FROM ClaimedItems WHERE scheduleDelivery = 'Unscheduled'";
+
+  // Execute the database query
+  db.query(query, (err, results) => {
+      if (err) {
+          console.error('Error fetching claimed items:', err);
+          return res.status(500).json({
+              status: 'error',
+              message: 'Error fetching claimed items',
+              error: err.message, 
+          });
+      }
+
+      return res.status(200).json({
+          status: 'success',
+          data: results,
+      });
+  });
+});
+
+
+
+  app.get('/api/clothes-donations', (req, res) => {
     const query = 'SELECT * FROM clothesdonations WHERE claimStatus = ?';
     db.query(query, ['Unclaimed'], (err, results) => {
       if (err) {
@@ -276,17 +313,16 @@ app.get('/api/all-food-donations', (req, res) => {
       res.json(results);
     });
   });
-  */
 
   app.post('/api/add-education-donation', (req, res) => {
-    const { type, level, c_condition, quantity, itemName, description, images, subject, institution, grade, donorUsername } = req.body;
+    const { type, level, c_condition, quantity, itemName, description, images, subject, donorUsername } = req.body;
   
     const query = `
-      INSERT INTO EducationDonations (type, level, c_condition, quantity, itemName, description, images, subject,institution, grade, donorUsername)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?,?,?)
+      INSERT INTO EducationDonations (type, level, c_condition, quantity, itemName, description, images, subject, donorUsername)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
   
-    db.query(query, [type, level, c_condition, quantity, itemName, description, JSON.stringify(images), subject, institution, grade ,donorUsername], (err, results) => {
+    db.query(query, [type, level, c_condition, quantity, itemName, description, JSON.stringify(images), subject, donorUsername], (err, results) => {
       if (err) {
         console.error('Error inserting education donation:', err);
         return res.status(500).send('Error inserting education donation');
@@ -296,158 +332,111 @@ app.get('/api/all-food-donations', (req, res) => {
   });
 
   
-  app.get("/api/education-donations", (req, res) => {
-    const userProfile = JSON.parse(req.query.userProfile || "{}");
-    const childrenProfiles = userProfile.childrenProfiles || []; // Extract children profiles
-  
-    // Query for all unclaimed education donations
-    const query = "SELECT * FROM EducationDonations WHERE claimStatus = ?";
-  
-    db.query(query, ["Unclaimed"], (err, results) => {
+  app.get('/api/education-donations', (req, res) => {
+    const query = 'SELECT * FROM EducationDonations WHERE claimStatus = ?';
+    db.query(query, ['Unclaimed'], (err, results) => {
       if (err) {
-        console.error("Error fetching data:", err);
-        return res.status(500).send("Error fetching data");
+        console.error('Error fetching education donations:', err);
+        return res.status(500).send('Error fetching data');
       }
-  
-      // Function to check if an item matches either the parent or any child's profile
-      const isRecommended = (item) => {
-        // Check for parent match
-        const parentMatch =
-          
+      res.json(results);
+    });
+  });
+  // API endpoint to approve a claimed item
+app.post('/api/approve-claim', (req, res) => {
+  const { id } = req.body;
 
-          ((userProfile.institution && item.institution === userProfile.institution) &&
-          (userProfile.class && item.grade === userProfile.class)) ||
-          (userProfile.class && item.grade === userProfile.class)
-  
-        // Check if any child matches
-        const childMatch = childrenProfiles.some(
-          (child) =>
-            
-            ((child.institution && item.institution === child.institution) &&
-            (child.class && item.class === child.class)) ||
-            (child.class && item.class === child.class)
-        );
-  
-        return parentMatch || childMatch;
-      };
-  
-      // Filter recommendations
-      const recommended = results.filter(isRecommended);
-  
-      // Filter other items that do not match the recipient or children
-      const others = results.filter((item) => !isRecommended(item));
-  
-      // Sort both arrays by createdAt in descending order
-      const sortByCreatedAt = (a, b) => new Date(b.createdAt) - new Date(a.createdAt);
-      recommended.sort(sortByCreatedAt);
-      others.sort(sortByCreatedAt);
-  
-      res.json({
-        recommended: recommended,
-        others: others,
+  const query = `
+    UPDATE ClaimedItems 
+    SET claimStatus = 'Approved' 
+    WHERE id = ?
+  `;
+
+  db.query(query, [id], (err, result) => {
+    if (err) {
+      console.error('Error approving claim:', err);
+      return res.status(500).send('Error approving claim');
+    }
+    res.status(200).send('Claim approved successfully');
+  });
+});
+
+// API endpoint to delete a claim (decline a claim)
+app.delete('/api/delete-claim/:id', (req, res) => {
+  const { id } = req.params;  // Extract claim ID from the request parameters
+
+  // Query to delete the claim by its ID from the ClaimedItems table
+  const query = `
+    DELETE FROM ClaimedItems
+    WHERE id = ?
+  `;
+
+  // Execute the query to remove the claim
+  db.query(query, [id], (err, result) => {
+    if (err) {
+      console.error('Error deleting claim:', err);
+      return res.status(500).json({
+        status: 'error',
+        message: 'Error deleting claim',
       });
+    }
+
+    // Check if any rows were affected (i.e., claim found and deleted)
+    if (result.affectedRows === 0) {
+      return res.status(404).json({
+        status: 'error',
+        message: 'Claim not found',
+      });
+    }
+
+    // Success: Claim deleted
+    res.status(200).json({
+      status: 'success',
+      message: 'Claim deleted successfully',
     });
   });
+});
+
+  //for tables after clicking yes
+  app.post('/api/approve-claims', (req, res) => {
+    const { id,category } = req.body;
   
+    let query = '';
+    
+    // Determine which table to update based on the category
+    switch (category) {
+      case 'Education':
+        query = `
+          UPDATE educationdonations 
+          SET claimStatus = 'Claimed' 
+          WHERE id = ?
+        `;
+        break;
+      case 'Clothes':
+        query = `
+          UPDATE clothesdonations 
+          SET claimStatus = 'Claimed' 
+          WHERE id = ?
+        `;
+        break;
+      case 'Food':
+        query = `
+          UPDATE fooddonations 
+          SET claimStatus = 'Claimed' 
+          WHERE id = ?
+        `;
+        break;
+      default:
+        return res.status(400).send('Invalid category');
+    }
   
-  
-  app.get("/api/clothes-donations", (req, res) => {
-    const userProfile = JSON.parse(req.query.userProfile || "{}");
-    const childrenProfiles = userProfile.childrenProfiles || []; // Extract children profiles
-  
-    // Query for all unclaimed items
-    const query = "SELECT * FROM clothesdonations WHERE claimStatus = ?";
-  
-    db.query(query, ["Unclaimed"], (err, results) => {
+    // Execute the query with the item ID
+    db.query(query, [id], (err, result) => {
       if (err) {
-        console.error("Error fetching data:", err);
-        return res.status(500).send("Error fetching data");
+        console.error('Error approving claim:', err);
+        return res.status(500).send('Error approving claim');
       }
-  
-      // Function to check if an item matches either the parent or any child's profile
-      const isRecommended = (item) => {
-        // Check for parent match based on item category and clothing category
-        const parentMatch = (() => {
-          // Gender must match in all cases
-          if (userProfile.gender && item.gender !== userProfile.gender) {
-            return false;
-          }
-  
-          if (item.itemCategory === 'Clothes') {
-            if (item.clothesCategory === 'Upper Wear') {
-              return userProfile.shirtSize && item.upperWearSize === userProfile.shirtSize;
-            } else if (item.clothesCategory === 'Bottom Wear') {
-              return userProfile.trouserSize && item.bottomWearSize === userProfile.trouserSize;
-            } else if (item.clothesCategory === 'Full Outfit') {
-              return userProfile.clothingSize && item.clothingSize === userProfile.clothingSize;
-            }
-          } else if (item.itemCategory === 'Shoes') {
-            return userProfile.shoeSize && item.shoeSize === userProfile.shoeSize;
-          }
-  
-          return false;
-        })();
-  
-        // Check if any child matches based on item category and clothing category
-        const childMatch = childrenProfiles.some(child => {
-          // Gender must match in all cases
-          if (child.gender && item.gender !== child.gender) {
-            return false;
-          }
-  
-          if (item.itemCategory === 'Clothes') {
-            if (item.clothesCategory === 'Upper Wear') {
-              return child.shirtSize && item.upperWearSize === child.shirtSize;
-            } else if (item.clothesCategory === 'Bottom Wear') {
-              return child.trouserSize && item.bottomWearSize === child.trouserSize;
-            } else if (item.clothesCategory === 'Full Outfit') {
-              return child.clothingSize && item.clothingSize === child.clothingSize;
-            }
-          } else if (item.itemCategory === 'Shoes') {
-            return child.shoeSize && item.shoeSize === child.shoeSize;
-          }
-  
-          return false;
-        });
-  
-        return parentMatch || childMatch;
-      };
-  
-      // Filter recommendations
-      const recommended = results.filter(isRecommended);
-  
-      // Filter other items that do not match parent or children
-      const others = results.filter((item) => !isRecommended(item));
-  
-      // Sort both arrays by createdAt in descending order
-      const sortByCreatedAt = (a, b) => new Date(b.createdAt) - new Date(a.createdAt);
-      recommended.sort(sortByCreatedAt);
-      others.sort(sortByCreatedAt);
-  
-      res.json({
-        recommended: recommended,
-        others: others,
-      });
+      res.status(200).send('Claim updated successfully');
     });
   });
-  app.get("/api/all-clothes-donations", (req, res) => {
-    const query = "SELECT * FROM clothesdonations WHERE claimStatus = ?"
-    db.query(query, ["Unclaimed"], (err, results) => {
-      if (err) {
-        console.error("Error fetching data:", err)
-        return res.status(500).send("Error fetching data")
-      }
-      res.json(results)
-    })
-  })
-  app.get("/api/all-education-donations", (req, res) => {
-    const query = "SELECT * FROM educationdonations WHERE claimStatus = ?"
-    db.query(query, ["Unclaimed"], (err, results) => {
-      if (err) {
-        console.error("Error fetching education donations:", err)
-        return res.status(500).send("Error fetching data")
-      }
-      res.json(results)
-    })
-  })
   

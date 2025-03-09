@@ -77,6 +77,7 @@ export default function App(){
 <Stack.Screen name="ChildrenProfiles" component={ChildrenProfiles}/>
 <Stack.Screen name="RiderFinalHomeScreen" component={RiderFinalHomeScreen}/>
 <Stack.Screen name="DeliveryHistory" component={DeliveryHistory}/>
+<Stack.Screen name="ScheduleRDeliveryScreen" component={ScheduleRDeliveryScreen}/>
 
             <Stack.Screen name="TabNavigator" component={TabNavigator} />
 
