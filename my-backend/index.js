@@ -409,4 +409,26 @@ app.delete('/api/delete-claim/:id', (req, res) => {
       res.status(200).send('Claim updated successfully');
     });
   });
-  
+  //api to return notifications to recipient
+  app.get('/api/claimed-status', (req, res) => {
+    const query = 'SELECT * FROM ClaimedItems WHERE claimStatus = ?';
+    
+    // Execute the database query with 'Approved' status instead of 'Claimed'
+    db.query(query, ['Approved'], (err, results) => {
+        if (err) {
+            // Log the error for debugging
+            console.error('Error fetching claimed items:', err);
+            return res.status(500).json({
+                status: 'error',
+                message: 'Error fetching claimed items',
+                error: err.message, // Optional: Return the actual error for debugging (remove in production)
+            });
+        }
+
+        // Return the results in a structured format
+        return res.status(200).json({
+            status: 'success',
+            data: results,
+        });
+    });
+});

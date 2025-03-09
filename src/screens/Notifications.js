@@ -11,31 +11,54 @@ const Notifications = ({ route }) => {
     const [message, setMessage] = useState('');
     const { user } = useContext(AuthContext);
     const isDonor = role && role.toLowerCase() === 'donor';
+    const isRecipient = role && role.toLowerCase() === 'recipient';
 
     useEffect(() => {
         const fetchNotifications = async () => {
-            if (isDonor) {
-                try {
-                    const BASE_URL = await getBaseUrl();
-                    const response = await axios.get(`${BASE_URL}/api/claimed-items`);
-                    
-                    if (response.data.status === 'success') {
-                        const donorItems = response.data.data.filter(
+            try {
+                const BASE_URL = await getBaseUrl();
+                const response = await axios.get(`${BASE_URL}/api/claimed-items`);
+                const responses = await axios.get(`${BASE_URL}/api/claimed-status`);
+
+                if (response.data.status === 'success') {
+                    let filteredItems = [];
+
+                    if (isDonor) {
+                        // For donors, display items they donated that were claimed
+                        filteredItems = response.data.data.filter(
                             (item) => item.donorUsername === user.username
                         );
-        
-                        if (donorItems.length > 0) {
-                            setNotifications(donorItems);
+
+                        if (filteredItems.length > 0) {
+                            setNotifications(filteredItems);
                         } else {
                             setMessage('No items claimed for this donor.');
                         }
-                    } else {
-                        setMessage('No claimed items found.');
+                    } else if (isRecipient) {
+                        console.log("Fetched items for recipient:", responses.data.data);
+
+                        // For recipients, display items they claimed where claimStatus is 'approved'
+                        filteredItems = responses.data.data.filter(
+
+                            (item) => 
+
+                                item.claimerUsername === user.username && 
+                                item.claimStatus === 'Approved'
+
+                        );
+
+                        if (filteredItems.length > 0) {
+                            setNotifications(filteredItems);
+                        } else {
+                            setMessage('No approved items found for this recipient.');
+                        }
                     }
-                } catch (error) {
-                    console.error('Error fetching notifications:', error);
-                    setMessage('Failed to load notifications.');
+                } else {
+                    setMessage('No claimed items found.');
                 }
+            } catch (error) {
+                console.error('Error fetching notifications:', error);
+                setMessage('Failed to load notifications.');
             }
         };
 
@@ -46,7 +69,7 @@ const Notifications = ({ route }) => {
 
     const handleApprove = async (id) => {
         try {
-            const BASE_URL = await getBaseUrl();  // If you're using a base URL helper function
+            const BASE_URL = await getBaseUrl();
 
             await axios.post(`${BASE_URL}/api/approve-claim`, { id }); // Pass the id in the request body
 
@@ -60,12 +83,10 @@ const Notifications = ({ route }) => {
 
     const declineClaim = async (id) => {
         try {
-            // API call to delete the claim from the database
-            const BASE_URL = await getBaseUrl();  // If you're using a base URL helper function
-            const response = await axios.delete(`${BASE_URL}/api/delete-claim/${id}`); // Adjust the API endpoint based on your backend
-    
+            const BASE_URL = await getBaseUrl();
+            const response = await axios.delete(`${BASE_URL}/api/delete-claim/${id}`);
+
             if (response.data.status === 'success') {
-                // Update the notifications state to remove the declined item
                 setNotifications(notifications.filter((item) => item.id !== id));
                 setMessage('Claim declined successfully.');
             } else {
@@ -76,7 +97,6 @@ const Notifications = ({ route }) => {
             setMessage('Failed to decline the claim.');
         }
     };
-    
 
     return (
         <View style={styles.container}>
@@ -94,14 +114,18 @@ const Notifications = ({ route }) => {
                             <Text style={styles.itemText}>Claimed by: {item.claimerUsername}</Text>
                             <Text style={styles.itemText}>Item name: {item.itemName}</Text>
 
-                            <View style={styles.buttonContainer}>
-                                <TouchableOpacity style={styles.approveButton} onPress={() => handleApprove(item.id)}>
-                                    <Text style={styles.buttonText}>Approve</Text>
-                                </TouchableOpacity>
-                                <TouchableOpacity style={styles.declineButton} onPress={() => declineClaim(item.id)}>
-                                    <Text style={styles.buttonText}>Decline</Text>
-                                </TouchableOpacity>
-                            </View>
+                            {isDonor ? (
+                                <View style={styles.buttonContainer}>
+                                    <TouchableOpacity style={styles.approveButton} onPress={() => handleApprove(item.id)}>
+                                        <Text style={styles.buttonText}>Approve</Text>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity style={styles.declineButton} onPress={() => declineClaim(item.id)}>
+                                        <Text style={styles.buttonText}>Decline</Text>
+                                    </TouchableOpacity>
+                                </View>
+                            ) : (
+                                <Text style={styles.approvedText}>Your item has been APPROVED.</Text>
+                            )}
                         </View>
                     ))
                 ) : (
@@ -176,6 +200,12 @@ const styles = StyleSheet.create({
         color: theme.colors.ivory,
         fontWeight: 'bold',
         fontSize: 16,
+    },
+    approvedText: {
+        fontSize: 16,
+        color: theme.colors.copper,
+        marginTop: 10,
+        fontWeight: 'bold',
     },
     noNotificationText: {
         fontSize: 18,
