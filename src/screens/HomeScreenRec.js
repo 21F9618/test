@@ -12,6 +12,7 @@ const HomeScreenRec = ({ navigation, route }) => {
   const { role, type } = route.params;  // Assuming `role` and `type` are passed in params
   const { user } = useContext(AuthContext);
   
+  
 
   return (
     <View style={[Styles.container, { marginBottom: tabBarHeight }]}>

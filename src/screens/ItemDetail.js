@@ -51,9 +51,18 @@ const ItemDetail = ({ route }) => {
     setIsUpdating(true)
     try {
       // Update in Firestore
-      await firestore().collection("individual_profiles").doc(user.uid).update({
-        khairPoints: newPoints,
-      })
+      if (user.recipientType==='individual'){
+        await firestore().collection("individual_profiles").doc(user.uid).update({
+          khairPoints: newPoints,
+        })
+
+      }
+      else if(user.recipientType==='ngo'){
+        await firestore().collection("ngo_profiles").doc(user.uid).update({
+          khairPoints: newPoints,
+        })
+      }
+     
 
       // Update local state in context using functional update pattern
       setUserProfile((prevProfile) => ({
