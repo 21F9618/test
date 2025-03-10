@@ -190,6 +190,7 @@ const RiderFinalHomeScreen = ({ navigation, route }) => {
                 return { ...order, hasValidRoute }
               }),
             )
+            
 
             // Filter orders that have a valid route
             const ordersWithValidRoutes = ordersWithRouteInfo.filter((order) => order.hasValidRoute)

@@ -17,7 +17,7 @@ export{default as DonorProfileForm} from "./DonorProfileForm";
 export{default as NGOCampaignForm} from "./NGOCampaignForm";
 export{default as RecipientProfileForm} from "./RecipientProfileForm";
 export{default as ChildrenProfiles} from "./ChildrenProfiles";
-export{default as donorOrderTrackingScreen} from "./donorOrderTrackingScreen";
+
 
 
 
@@ -34,6 +34,7 @@ export { default as  ScheduleRDeliveryScreen} from "./ScheduleRDeliveryScreen";
 export {default as DonationSuccessScreen} from './DonationSuccessScreen';
 
 export{default as RiderFinalHomeScreen} from './RiderFinalHomeScreen';
+export{default as DonorOrderTrackingScreen} from './DonerOrderTrackingScreen';
 
 
 //eishah nadeem screens:
