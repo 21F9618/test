@@ -27,6 +27,7 @@ export default function ScheduleRDeliveryScreen({ navigation }) {
     dropOffLocation: false
   });
   const { id = 6 } = route.params || {};
+  console.log("this is the id that we got from the route",id);
   const [showLocationModal, setShowLocationModal] = useState(false);
 
   // State for claimed item data

@@ -47,12 +47,14 @@ const Notifications = ({ navigation,route }) => {
 
     const handleApprove = async (id) => {
         try {
+            console.log("in the handel approve",id);
             const BASE_URL = await getBaseUrl();  // If you're using a base URL helper function
 
             await axios.post(`${BASE_URL}/api/approve-claim`, { id }); // Pass the id in the request body
 
             setMessage('Claim approved successfully.');
             setNotifications(notifications.filter(item => item.id !== id));
+            console.log("the is to be sent to the Sdelivery page",id);
             navigation.navigate('ScheduleRDeliveryScreen', { id }); 
         } catch (error) {
             console.error('Error approving claim:', error);
