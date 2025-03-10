@@ -22,7 +22,8 @@ import {
   WaitForApprovalScreen,
   ChildrenProfiles,
   RiderFinalHomeScreen,
-  DeliveryHistory
+  DeliveryHistory,
+  donorOrderTrackingScreen
   
 } from "./src/screens";
 import TabNavigator from './src/navigator/TabNavigator';
@@ -79,6 +80,7 @@ export default function App(){
 <Stack.Screen name="RiderFinalHomeScreen" component={RiderFinalHomeScreen}/>
 <Stack.Screen name="DeliveryHistory" component={DeliveryHistory}/>
 <Stack.Screen name="ScheduleRDeliveryScreen" component={ScheduleRDeliveryScreen}/>
+<Stack.Screen name="donorOrderTrackingScreen" component={donorOrderTrackingScreen}/>
 
             <Stack.Screen name="TabNavigator" component={TabNavigator} />
 

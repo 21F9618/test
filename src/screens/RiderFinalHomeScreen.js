@@ -10,9 +10,12 @@ import FontAwesome from "react-native-vector-icons/FontAwesome"
 import NewOrderPopup from "../components/NewOrderPopup"
 import { AuthContext } from "../context/AuthContext"
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs"
+import RiderLocationService from "../components/rider-location-service"
+
+
 
 const GOOGLE_API_KEY = "AIzaSyB9irjntPHdEJf024h7H_XKpS11OeW1Nh8"
-const origin = { latitude: 37.3318456, longitude: -122.0296002 }
+const originrider = { latitude: 37.3318456, longitude: -122.0296002 }
 const destination = { latitude: 37.771707, longitude: -122.4053769 }
 
 const RiderFinalHomeScreen = ({ navigation, route }) => {
@@ -34,6 +37,21 @@ const RiderFinalHomeScreen = ({ navigation, route }) => {
   const [showPickupBanner, setShowPickupBanner] = useState(false)
   const [showDeliveryBanner, setShowDeliveryBanner] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
+  const [locationService, setLocationService] = useState(null)
+
+  // Initialize location service when component mounts
+  useEffect(() => {
+    const service = new RiderLocationService(user.username)
+    setLocationService(service)
+    console.log("setting location service", locationService)
+
+    return () => {
+      // Clean up by stopping tracking when component unmounts
+      if (service) {
+        service.stopTracking()
+      }
+    }
+  }, [user.username])
 
   // Load declined orders from Firestore on component mount
   useEffect(() => {
@@ -90,6 +108,46 @@ const RiderFinalHomeScreen = ({ navigation, route }) => {
     return () => unsubscribe() // Clean up the listener
   }, [user.username])
 
+  // Function to check if there's a valid route between two locations
+  const checkValidRoute = async (origin, destination) => {
+    if(origin){
+      console.log("origin exits")
+    }
+    else{
+      console.log("origin does not exist")
+      origin= originrider;
+    }
+    if(destination){
+      console.log("destination exits")
+    }
+    else{
+      console.log("destination does not exits")
+    }
+    try {
+      console.log("origin in checkValidity",origin,origin.latitude,origin.longitude)
+      console.log("destination in checkValidity",destination,destination.latitude,destination.longitude)
+  
+      // This is a simplified example - you'll need to implement the actual API call
+      const response = await fetch(
+        `https://maps.googleapis.com/maps/api/directions/json?origin=${origin.latitude},${origin.longitude}&destination=${destination.latitude},${destination.longitude}&key=${GOOGLE_API_KEY}`,
+      )
+
+      const data = await response.json()
+
+      // Check if a route was found
+      if (data.status === "OK" && data.routes && data.routes.length > 0) {
+        console.log("Valid route found between rider and order")
+        return true
+      } else {
+        console.log("No valid route found between rider and order")
+        return false
+      }
+    } catch (error) {
+      console.error("Error checking route validity:", error)
+      return false // Assume no valid route in case of error
+    }
+  }
+
   // Listen for pending orders
   useEffect(() => {
     if (isLoading) return // Don't fetch orders until declined orders are loaded
@@ -101,7 +159,8 @@ const RiderFinalHomeScreen = ({ navigation, route }) => {
       .where("status", "==", "pending") // Get only unassigned orders
       .limit(10) // Fetch more orders to filter from
       .onSnapshot(
-        (snapshot) => {
+        async (snapshot) => {
+          // Added async here
           console.log("Orders collection accessed.")
 
           if (snapshot.empty) {
@@ -123,10 +182,27 @@ const RiderFinalHomeScreen = ({ navigation, route }) => {
           )
 
           if (availableOrders.length > 0) {
-            // Get the first available order
-            const newOrderData = availableOrders[0]
-            setNewOrder(newOrderData)
-            console.log("Order details:", newOrderData)
+            // Check for valid routes for each available order
+            const ordersWithRouteInfo = await Promise.all(
+              availableOrders.map(async (order) => {
+                // Check if there's a valid route between rider and order origin
+                const hasValidRoute = await checkValidRoute(myPosition, order.destination)
+                return { ...order, hasValidRoute }
+              }),
+            )
+
+            // Filter orders that have a valid route
+            const ordersWithValidRoutes = ordersWithRouteInfo.filter((order) => order.hasValidRoute)
+
+            if (ordersWithValidRoutes.length > 0) {
+              // Get the first available order with a valid route
+              const newOrderData = ordersWithValidRoutes[0]
+              setNewOrder(newOrderData)
+              console.log("Order with valid route found:", newOrderData)
+            } else {
+              console.log("No orders with valid routes available")
+              setNewOrder(null)
+            }
           } else {
             setNewOrder(null)
           }
@@ -137,7 +213,7 @@ const RiderFinalHomeScreen = ({ navigation, route }) => {
       )
 
     return () => unsubscribe() // Cleanup subscription
-  }, [declinedOrders, isLoading])
+  }, [declinedOrders, isLoading, myPosition])
 
   // Update banners based on order status
   useEffect(() => {
@@ -162,6 +238,10 @@ const RiderFinalHomeScreen = ({ navigation, route }) => {
     if (!newOrder) return
 
     console.log("Order accepted:", newOrder)
+    // Ensure location tracking is active when accepting an order
+    if (locationService && !locationService.isCurrentlyTracking()) {
+      await locationService.startTracking()
+    }
 
     try {
       // Update the order in Firestore with the current rider's ID
@@ -305,6 +385,17 @@ const RiderFinalHomeScreen = ({ navigation, route }) => {
   const onGopress = async () => {
     const newStatus = !isOnline
     setIsOnline(newStatus)
+
+    // Start or stop location tracking based on online status
+    if (newStatus && locationService) {
+      const started = await locationService.startTracking()
+      if (!started) {
+        console.error("Failed to start location tracking")
+        // Optionally show an alert to the user
+      }
+    } else if (locationService) {
+      locationService.stopTracking()
+    }
 
     // Update rider's online status in Firestore
     try {
@@ -537,6 +628,7 @@ const RiderFinalHomeScreen = ({ navigation, route }) => {
     </View>
   )
 }
+
 
 const styles = StyleSheet.create({
   bottomContainer: {
