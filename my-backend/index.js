@@ -115,6 +115,23 @@ const createTables = () => {
     donorUsername VARCHAR(255) NOT NULL
   );
 `;
+const ngoCampaignsTable = `
+  CREATE TABLE IF NOT EXISTS NGOCampaigns (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    ngoName VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL,
+    phoneNumber VARCHAR(20) NOT NULL,
+    bankAccount VARCHAR(16) NOT NULL,
+    campaignTitle VARCHAR(255) NOT NULL,
+    shortDescription VARCHAR(255) NOT NULL,
+    fullDescription TEXT NOT NULL,
+    image TEXT NOT NULL,
+
+    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    claimStatus VARCHAR(255) DEFAULT 'Unclaimed',
+    campaignCreatorUsername VARCHAR(255) NOT NULL
+  );
+`;
 
   
     db.query(donationsTable, (err, result) => {
@@ -122,6 +139,13 @@ const createTables = () => {
         console.log('Error creating Donations table:', err);
       } else {
         console.log('Donations table created successfully');
+      }
+    });
+    db.query(ngoCampaignsTable, (err, result) => {
+      if (err) {
+        console.log('Error creating NGOCampaigns table:', err);
+      } else {
+        console.log('NGOCampaigns table created successfully');
       }
     });
     db.query(claimedItemsTable, (err, result) => {
@@ -153,6 +177,7 @@ const createTables = () => {
         console.log('EducationDonations table created successfully');
       }
     });
+    
 
     
   };
@@ -187,6 +212,7 @@ const createTables = () => {
       res.status(200).send('Food donation added successfully');
     });
   });
+  
   
   app.get('/users', (req, res) => {
     let sql = 'SELECT * FROM fooddonations'; // Replace with your table name
@@ -733,4 +759,106 @@ app.post('/api/reverse-claim-status', (req, res) => {
     res.status(200).send('Claim updated successfully');
   });
 });
+//adding campaignform to db
+app.post('/api/add-ngo-campaign', (req, res) => {
+  console.log(req.body);
 
+  // Destructuring form data from the request body
+  const { ngoName, email, phoneNumber, bankAccount, campaignTitle, shortDescription, fullDescription, image, campaignCreatorUsername } = req.body;
+
+  console.log("Received data:", { ngoName, email, phoneNumber, bankAccount, campaignTitle, shortDescription, fullDescription, image, campaignCreatorUsername });
+
+  const query = `
+    INSERT INTO NGOCampaigns (ngoName, email, phoneNumber, bankAccount, campaignTitle, shortDescription, fullDescription, image, campaignCreatorUsername)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `;
+
+  // Log the data being passed to the query
+  console.log('Executing query with:', [ngoName, email, phoneNumber, bankAccount, campaignTitle, shortDescription, fullDescription, image, campaignCreatorUsername]);
+
+  db.query(query, [ngoName, email, phoneNumber, bankAccount, campaignTitle, shortDescription, fullDescription, image, campaignCreatorUsername], (err, results) => {
+    if (err) {
+      console.error('Error inserting NGO campaign:', err);
+      return res.status(500).send('Error inserting NGO campaign');
+    }
+    console.log('Insert result:', results); // Log the results to ensure insertion
+    res.status(200).send('NGO campaign added successfully');
+  });
+});
+
+
+// GET API to fetch all NGO campaigns from the database
+app.get('/api/get-ngo-campaigns', (req, res) => {
+  const query = 'SELECT * FROM NGOCampaigns';
+
+  // Log the query being executed
+  console.log('Fetching all NGO campaigns...');
+
+  db.query(query, (err, results) => {
+    if (err) {
+      console.error('Error fetching NGO campaigns:', err);
+      return res.status(500).send('Error fetching NGO campaigns');
+    }
+    
+    // Log the results to ensure data retrieval
+    console.log('Fetched NGO campaigns:', results);
+    res.status(200).json(results);
+  });
+});
+// Example backend route (Node.js/Express)
+app.get('/api/get-campaign-details/:id', async (req, res) => {
+  try {
+    const campaignId = req.params.id;
+    // Query your database for the campaign with this ID
+    const campaign = await db.query('SELECT * FROM ngocampaigns WHERE id = ?', [campaignId]);
+    
+    if (campaign.length === 0) {
+      return res.status(404).json({ message: 'Campaign not found' });
+    }
+    
+    res.json(campaign[0]);
+  } catch (error) {
+    console.error('Error fetching campaign details:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+// API endpoint to get notification count
+app.get('/api/get-notification-count', (req, res) => {
+  const { username, role } = req.query;
+  
+  let query = '';
+  
+  if (role && role.toLowerCase() === 'donor') {
+    // For donors: count of items with 'Claimed' status that belong to this donor
+    query = 'SELECT COUNT(*) as count FROM ClaimedItems WHERE donorUsername = ? AND claimStatus = ?';
+    db.query(query, [username, 'Claimed'], (err, results) => {
+      if (err) {
+        console.error('Error fetching notification count:', err);
+        return res.status(500).json({ count: 0 });
+      }
+      return res.status(200).json({ count: results[0].count });
+    });
+  } else if (role && role.toLowerCase() === 'recipient') {
+    // For recipients: count of items with 'Approved' status that belong to this recipient
+    query = 'SELECT COUNT(*) as count FROM ClaimedItems WHERE claimerUsername = ? AND claimStatus = ?';
+    db.query(query, [username, 'Approved'], (err, results) => {
+      if (err) {
+        console.error('Error fetching notification count:', err);
+        return res.status(500).json({ count: 0 });
+      }
+      return res.status(200).json({ count: results[0].count });
+    });
+  } else {
+    // Default response if role is not specified
+    return res.status(200).json({ count: 0 });
+  }
+});
+
+// API endpoint to reset notification count
+app.get('/api/reset-notification-count', (req, res) => {
+  const { username, role } = req.query;
+  
+  // For now, we'll just return success
+  // In a real implementation, you might want to mark notifications as read in the database
+  return res.status(200).json({ success: true });
+});
