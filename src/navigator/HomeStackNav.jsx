@@ -64,7 +64,7 @@ const HomeStackNav = ({ navigation, route }) => {
           title: "", headerTitleStyle: { textAlign: 'center' },
           headerTitleAlign: 'center', headerStyle: { backgroundColor: theme.colors.charcoalBlack, height: 70 },
           headerTintColor: theme.colors.ivory
-        }} />
+        }}initialParams={{ ...route.params }} />
 
       <Stack.Screen name='ScheduleRDeliveryScreen' component={ScheduleRDeliveryScreen}
         options={{

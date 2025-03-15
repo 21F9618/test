@@ -9,9 +9,10 @@ import { theme } from "../core/theme"
 import { useFocusEffect } from "@react-navigation/native"
 import firestore from "@react-native-firebase/firestore"
 import { UserProfileContext } from "../context/UserProfileContext"
+import ScheduleRDeliveryScreen from "./ScheduleRDeliveryScreen"
 
 
-const Notifications = ({ route }) => {
+const Notifications = ({ route ,navigation}) => {
   const { role } = route.params
   const [notifications, setNotifications] = useState([])
   const [message, setMessage] = useState("")
@@ -236,8 +237,12 @@ const Notifications = ({ route }) => {
       setNotifications(notifications.filter((item) => item.id !== id))
       setMessage("Claim approved successfully.")
 
+
       // Also refresh in the background to ensure data consistency
       fetchNotifications()
+      navigation.navigate("ScheduleRDeliveryScreen", { id: id })
+
+      console.log(id)
     } catch (error) {
       console.error("Error approving claim:", error)
       setMessage("Failed to approve the claim.")

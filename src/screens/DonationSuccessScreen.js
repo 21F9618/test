@@ -1,38 +1,40 @@
+import React, { useContext, useState, useEffect } from 'react';
 
-import React from "react";
 import { StyleSheet, View, Text, TouchableOpacity, ImageBackground, Dimensions } from "react-native";
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { theme } from "../core/theme";  // Assuming you have a theme defined as before
+import { theme } from "../core/theme"; // Assuming you have a theme defined as before
 import CircleLogoStepper3 from "../components/CircleLogoStepper3";
 
 const screenWidth = Dimensions.get('window').width;
 
-export default function DonationSuccessScreen({ navigation }) {
+export default function DonationSuccessScreen({ navigation, route }) {
+  const { role } = route.params; // Extract the role from the route params
+
   return (
     <ImageBackground
       source={require('../../assets/items/0d59de270836b6eafe057c8afb642e77.jpg')} // Replace with your image path
       style={styles.imageBackground}
       blurRadius={8} // Adjust the blur intensity
-
     >
-        <View style={{marginTop:0}}>
-        <CircleLogoStepper3></CircleLogoStepper3>
+      <View style={{ marginTop: 0 }}>
+        <CircleLogoStepper3 />
+      </View>
 
-        </View>
-        
       <View style={styles.container}>
         {/* Circular checkmark */}
         <View style={styles.circle}>
           <MaterialCommunityIcons name="check-circle" size={100} color={theme.colors.sageGreen} />
         </View>
 
-        {/* Success message */}
+        {/* Success message based on role */}
         <Text style={styles.successMessage}>
-          You have uploaded the donation successfully!
+          {role === "donor"
+            ? "You have uploaded the donation successfully!"
+            : "You have uploaded the campaign successfully!"}
         </Text>
 
         {/* Continue button */}
-        <TouchableOpacity style={styles.button} onPress={() => navigation.replace("TabNavigator",{role:"donor"})}>
+        <TouchableOpacity style={styles.button} onPress={() => navigation.replace("TabNavigator", { role })}>
           <Text style={styles.buttonText}>Continue</Text>
         </TouchableOpacity>
       </View>
@@ -55,7 +57,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     width: '90%', // Responsive width
     maxWidth: 350, // Max width to ensure readability
-    marginTop:60
+    marginTop: 60,
   },
   circle: {
     width: 150,
