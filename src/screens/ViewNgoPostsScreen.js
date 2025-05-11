@@ -208,7 +208,7 @@ export default function ViewNgoPostsScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: theme.colors.charcoalBlack,
+    backgroundColor: theme.colors.pearlWhite,
   },
   header: {
     flexDirection: 'row',
@@ -261,12 +261,12 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: 'rgba(10, 10, 10, 0.7)',
+    //backgroundColor: 'rgba(10, 10, 10, 0.7)',
     paddingVertical: 8,
     paddingHorizontal: 12,
   },
   ngoName: {
-    color: theme.colors.sageGreen,
+    color: theme.colors.ivory,
     fontWeight: 'bold',
     fontSize: 14,
   },
@@ -281,12 +281,12 @@ const styles = StyleSheet.create({
   },
   description: {
     fontSize: 14,
-    color: theme.colors.pearlWhite,
+    color: theme.colors.TaupeBlack,
     marginBottom: 12,
     lineHeight: 20,
   },
   divider: {
-    backgroundColor: 'rgba(178, 172, 136, 0.2)',
+    backgroundColor: '#ebe9de',
     height: 1,
     marginVertical: 12,
   },
@@ -300,7 +300,7 @@ const styles = StyleSheet.create({
   },
   contactText: {
     fontSize: 13,
-    color: theme.colors.pearlWhite,
+    color: theme.colors.TaupeBlack,
     marginLeft: 8,
   },
   buttonContainer: {
@@ -324,7 +324,7 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 12,
     fontSize: 16,
-    color: theme.colors.ivory,
+    color: theme.colors.pearlWhite,
   },
   noDataContainer: {
     alignItems: 'center',

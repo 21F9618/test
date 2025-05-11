@@ -393,14 +393,17 @@ const DetailItem = ({ icon, label, value }) => {
   // Dynamic styles based on language
   const dynamicStyles = {
     detailLabel: {
-      fontSize: isUrdu ? 18 : 16, // Increase font size for Urdu
+      fontSize: isUrdu ? 20 : 18, // Increase font size for Urdu
+
       color: theme.colors.ivory,
+      fontWeight: "400",
+
       marginBottom: 2,
     },
     detailValue: {
-      fontSize: isUrdu ? 20 : 18, // Increase font size for Urdu
-      color: theme.colors.pearlWhite,
-      fontWeight: "500",
+      fontSize: isUrdu ? 18 : 16, // Increase font size for Urdu
+      color: theme.colors.ivory,
+      fontWeight: "300",
     }
   }
   
@@ -418,115 +421,190 @@ const DetailItem = ({ icon, label, value }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: theme.colors.charcoalBlack,
+    backgroundColor: theme.colors.charcoalBlack, // Using the white background
+    paddingHorizontal: 20,
   },
   imageContainer: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
-    marginVertical: 20,
-  },
-  navButton: {
-    padding: 10,
+    justifyContent: "space-between",
+    backgroundColor: theme.colors.outerSpace, // Light mint for the image container
+    paddingVertical: 15,
+    paddingHorizontal: 15,
+    borderRadius: theme.roundness,
+    marginVertical: 12,
+    shadowColor: theme.colors.TaupeBlack,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   image: {
     width: 250,
     height: 250,
-    borderRadius: 10,
-    marginHorizontal: 20,
+    resizeMode: "contain",
+    borderRadius: theme.roundness - 4,
+    borderWidth: 1,
+    borderColor: theme.colors.sageGreen, // Forest green border
+    backgroundColor: theme.colors.pearlWhite, // White background for image
+  },
+  navButton: {
+    padding: 12,
+    backgroundColor: theme.colors.sageGreen, // Forest green for buttons
+    borderRadius: 24,
+    shadowColor: theme.colors.TaupeBlack,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
+    elevation: 2,
   },
   title: {
-    fontSize: 28,
-    color: theme.colors.pearlWhite,
+    fontSize: 26,
     fontWeight: "bold",
+    color: theme.colors.sageGreen, // Forest green for title
     textAlign: "center",
-    marginBottom: 20,
+    marginVertical: 16,
+    letterSpacing: 0.5,
   },
   detailsCard: {
-    backgroundColor: theme.colors.TaupeBlack,
-    borderRadius: 15,
-    padding: 20,
-    marginHorizontal: 20,
-    marginBottom: 20,
+    backgroundColor: theme.colors.outerSpace, // Light mint for card background
+    borderRadius: theme.roundness,
+    padding: 18,
+    marginVertical: 12,
+    shadowColor: theme.colors.TaupeBlack,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 2,
+    borderWidth: 1,
+    borderColor: theme.colors.copper , // Subtle mint border
   },
-  detailItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 15,
-  },
-  detailIcon: {
-    marginRight: 15,
-  },
-  detailTextContainer: {
-    flex: 1,
-  },
-  // detailLabel and detailValue moved to dynamicStyles
   noDetailsText: {
     fontSize: 16,
-    color: theme.colors.ivory,
+    color: theme.colors.error, // Using the error color from theme
     textAlign: "center",
+    fontStyle: "italic",
   },
   claimButton: {
-    backgroundColor: theme.colors.sageGreen,
-    paddingVertical: 15,
-    paddingHorizontal: 30,
-    borderRadius: 8,
-    marginHorizontal: 20,
-    marginBottom: 30,
+    backgroundColor: theme.colors.sageGreen, // Forest green for primary action
+    margin: 20,
+    padding: 16,
+    borderRadius: theme.roundness,
     alignItems: "center",
+    shadowColor: theme.colors.TaupeBlack,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 3,
   },
   disabledClaimButton: {
-    backgroundColor: theme.colors.outerSpace,
+    backgroundColor: theme.colors.placeholder, // Using placeholder color for disabled state
+    shadowOpacity: 0.1,
   },
   claimButtonText: {
+    color: theme.colors.pearlWhite, // White text on green button
     fontSize: 18,
-    color: theme.colors.ivory,
-    fontWeight: "bold",
+    fontWeight: "600",
+    letterSpacing: 0.5,
   },
   modalOverlay: {
     flex: 1,
+    backgroundColor: "hsla(158, 47.90%, 14.30%, 0.40)", // Semi-transparent forest green
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)", // Semi-transparent background
   },
   modalContent: {
-    width: 300,
-    backgroundColor: theme.colors.charcoalBlack,
-    padding: 20,
-    borderRadius: 15,
+    backgroundColor: theme.colors.charcoalBlack, // White background
+    padding: 24,
+    borderRadius: theme.roundness,
+    width: "85%",
     alignItems: "center",
-    justifyContent: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
+    borderWidth: 1,
+    borderColor: theme.colors.copper, // Mint border
   },
   modalTitle: {
-    fontSize: 24,
-    color: theme.colors.pearlWhite,
+    fontSize: 22,
     fontWeight: "bold",
-    marginBottom: 15,
+    color: theme.colors.sageGreen, // Forest green for title
+    marginBottom: 16,
+    textAlign: "center",
   },
-  // modalMessage moved to dynamicStyles
   modalButtons: {
     flexDirection: "row",
     justifyContent: "space-between",
+    marginTop: 20,
     width: "100%",
   },
   modalButton: {
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 8,
-    width: "45%",
+    flex: 1,
+    padding: 14,
+    borderRadius: theme.roundness - 4,
+    marginHorizontal: 8,
     alignItems: "center",
+    shadowColor: theme.colors.TaupeBlack,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
+    elevation: 2,
   },
   cancelButton: {
-    backgroundColor: theme.colors.outerSpace,
+    backgroundColor: theme.colors.error, // Error color for cancel
+    borderWidth: 1,
+    borderColor: theme.colors.error + '80',
   },
   confirmButton: {
-    backgroundColor: theme.colors.sageGreen,
+    backgroundColor: theme.colors.sageGreen, // Forest green for confirm
+    borderWidth: 1,
+    borderColor: theme.colors.sageGreen + '80',
   },
   modalButtonText: {
-    fontSize: 18,
-    color: theme.colors.ivory,
-    fontWeight: "bold",
+    color: theme.colors.pearlWhite, // White text on colored buttons
+    fontSize: 16,
+    fontWeight: "600",
+    letterSpacing: 0.5,
+  },
+  // Additional styles for better UI
+  detailsLabel: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: theme.colors.sageGreen, // Forest green for labels
+    marginBottom: 6,
+  },
+  detailsText: {
+    fontSize: 15,
+    color: theme.colors.ivory, // Black text for content
+    marginBottom: 14,
+    lineHeight: 22,
+  },
+  divider: {
+    height: 1,
+    backgroundColor: theme.colors.copper + '40', // Light mint divider
+    marginVertical: 12,
+    width: '100%',
+  },
+  imageNavContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    width: 70,
+    position: "absolute",
+    right: 15,
+    top: 15,
+  },
+  imageCounter: {
+    fontSize: 14,
+    color: theme.colors.sageGreen,
+    fontWeight: "600",
+    backgroundColor: theme.colors.pearlWhite + '90',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+    overflow: "hidden",
   },
 })
-
 export default ItemDetail

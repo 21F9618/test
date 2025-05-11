@@ -600,7 +600,7 @@ const UploadEdu = ({ navigation }) => {
 
 const Styles = StyleSheet.create({
   container: {
-    backgroundColor: theme.colors.charcoalBlack,
+    backgroundColor: theme.colors.pearlWhite,
     flex: 1,
     padding: 10,
     paddingTop: 30,
@@ -630,7 +630,7 @@ const Styles = StyleSheet.create({
     fontSize: 20, // Increased font size for Urdu headings
   },
   descri: {
-    backgroundColor: theme.colors.TaupeBlack,
+    backgroundColor: theme.colors.outerSpace,
     height: 150,
     borderWidth: 1,
     borderRadius: 10,
@@ -646,7 +646,7 @@ const Styles = StyleSheet.create({
     fontSize: 18, // Increased font size for Urdu input
   },
   name: {
-    backgroundColor: theme.colors.TaupeBlack,
+    backgroundColor: theme.colors.outerSpace,
     height: 40,
     borderWidth: 1,
     borderRadius: 10,
@@ -693,7 +693,7 @@ const Styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: theme.colors.sageGreen,
     borderRadius: 5,
-    backgroundColor: theme.colors.TaupeBlack,
+    backgroundColor: theme.colors.outerSpace,
     marginTop: 10,
   },
   picker: {

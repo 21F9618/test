@@ -161,7 +161,7 @@ const NGOProfileDetailsScreen = ({ navigation }) => {
  zIndex: 1,
  },
  textInputContainer: {
- backgroundColor: theme.colors.TaupeBlack,
+ backgroundColor: theme.colors.copper,
  borderTopWidth: 0,
  borderBottomWidth: 0,
  },
@@ -339,7 +339,7 @@ const NGOProfileDetailsScreen = ({ navigation }) => {
 
 const styles = StyleSheet.create({
  container: {
- backgroundColor: theme.colors.charcoalBlack,
+ backgroundColor: theme.colors.outerSpace,
  flex: 1,
  padding: 20,
  paddingTop: 40,
